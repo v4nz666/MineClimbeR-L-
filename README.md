@@ -11,6 +11,6 @@ They say MineCorp got too greedy - dug too deep - in their search for the diamon
 
 The sole survivor of the catastrophy - an old recluse, these days, hardly seen by anyone - was said to speak of monsters in the depths of the mine. People around town speak in hushed tones of an even greater treasure guarded by the beasts in the deepest, darkest depths of the old mine.
 
-Grabbing an old pick from the mining museum, and and handful of rock climbing supplies, you set out to reach the depths of the old mine, and determine once and for all the truth about the rumours.
+Grabbing an old pick from the mining museum, and a handful of rock climbing supplies, you set out to reach the depths of the old mine, and determine once and for all the truth about the rumours.
 
 --
