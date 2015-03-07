@@ -15,4 +15,4 @@ Grabbing an old pick from the mining museum, and a handful of rock climbing supp
 
 --
 
-Started 2:00PM AST Saturday Feb 7th, 2015
+Started 2:00PM AST Saturday Mar 7th, 2015
