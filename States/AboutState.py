@@ -2,4 +2,6 @@ from RoguePy.State.GameState import GameState
 
 class AboutState(GameState):
 
-  pass
+  def tick(self):
+    print "About"
+    self._manager.setNextState('Menu')
