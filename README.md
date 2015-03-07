@@ -14,3 +14,5 @@ The sole survivor of the catastrophy - an old recluse, these days, hardly seen b
 Grabbing an old pick from the mining museum, and a handful of rock climbing supplies, you set out to reach the depths of the old mine, and determine once and for all the truth about the rumours.
 
 --
+
+Started 2:00PM AST Saturday Feb 7th, 2015
