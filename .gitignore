@@ -52,3 +52,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#PyCharm project stuff
+.idea
+.idea/*
