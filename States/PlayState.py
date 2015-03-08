@@ -13,14 +13,14 @@ class PlayState(GameState):
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
 
-    #TODO REMOVE
-    self.offset = 0
 
   def tick(self):
-    self.mapElement.center(0, self.offset)
-    if self.player.calculateFov:
-      self.player.calculateFov()
-    pass
+    self.mapElement.center(self.player.x, self.player.y)
+    if self.player.needFovUpdate:
+      self.player.needFovUpdate = False
+      self.mapElement.calculateFovMap()
+
+
 
   def setCave(self, cave):
     self.cave = cave
@@ -82,17 +82,6 @@ class PlayState(GameState):
         },
       })
 
-
-  #TODO REMOVE
-  def scrollUp(self):
-    if self.offset > 0:
-      self.offset -= 1
-    pass
-  def scrollDown(self):
-    if self.offset < self.cave.height - self.view.height:
-      self.offset += 1
-  # END TODO
-
   def placePlayer(self):
     playerX = 1
     playerY = 1
@@ -102,6 +91,7 @@ class PlayState(GameState):
       if not c.passable():
         self.cave.addEntity(self.player, playerX, playerY - 1)
         self.player.setCoords(playerX, playerY - 1)
+        self.mapElement.setPlayer(self.player)
         placed = True
       else:
         playerY += 1
@@ -116,7 +106,7 @@ class PlayState(GameState):
     menuState.reset()
     self._manager.setNextState('Menu')
   ########
-  
+
   ########
   # Input handlers
   def mvUp(self) :
