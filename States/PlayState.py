@@ -19,6 +19,12 @@ class PlayState(GameState):
 
   def tick(self):
     self.mapElement.center(self.player.x, self.player.y)
+    if self.player.falling:
+      if self.cave.getCell(self.player.x, self.player.y + 1).passable():
+        self.mvPlayer(0, 1, self.player.moveD)
+      else:
+        self.player.falling = False
+
     if self.player.needFovUpdate:
       self.player.needFovUpdate = False
       self.mapElement.calculateFovMap()
@@ -110,93 +116,43 @@ class PlayState(GameState):
     self._manager.setNextState('Menu')
   ########
 
+  def mvPlayer(self, deltaX, deltaY, playerFunc):
+    x = self.player.x + deltaX
+    y = self.player.y + deltaY
+    cell = self.cave.getCell(x, y)
+    if x >= 0 and x < self.cave.width and y >= 0 and y < self.cave.height:
+      if cell.passable() or self.dig(x, y):
+        oldCell = self.cave.getCell(self.player.x, self.player.y)
+        oldCell.removeEntity(self.player)
+        playerFunc()
+        self.cave.addEntity(self.player, self.player.x, self.player.y)
+        self.player.falling = self.cave.getCell(self.player.x, self.player.y + 1).passable()
+
   ########
   # Input handlers
   def mvUp(self) :
-    y = self.player.y - 1
-    cell = self.cave.getCell(self.player.x, y)
-    if y >= 0:
-      if cell.passable() or self.dig(self.player.x, y):
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveU()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(0, -1, self.player.moveU)
 
   def mvDn(self) :
-    y = self.player.y + 1
-    cell = self.cave.getCell(self.player.x, y)
-    if y < self.cave.height:
-      if cell.passable() or self.dig(self.player.x, y):
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveD()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(0, 1, self.player.moveD)
 
   def mvLft(self) :
-    x = self.player.x - 1
-    cell = self.cave.getCell(x, self.player.y)
-    if x >= 0:
-      if cell.passable() or self.dig(x, self.player.y):
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveL()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(-1, 0, self.player.moveL)
 
   def mvRgt(self) :
-    x = self.player.x + 1
-    cell = self.cave.getCell(x, self.player.y)
-    if x < self.cave.width:
-      if cell.passable() or self.dig(x, self.player.y):
-        print "moving right"
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveR()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(1, 0, self.player.moveR)
 
   def mvUpLft(self) :
-    y = self.player.y - 1
-    x = self.player.x - 1
-    cell = self.cave.getCell(x, y)
-    if y >= 0 and x >= 0:
-      if cell.passable() or self.dig(x, y):
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveUL()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(-1, -1, self.player.moveUL)
 
   def mvUpRgt(self) :
-    y = self.player.y - 1
-    x = self.player.x + 1
-    cell = self.cave.getCell(x, y)
-    if y >= 0 and x < self.cave.width:
-      if cell.passable() or self.dig(x, y):
-        print "moving up/right"
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveUR()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(1, -1, self.player.moveUR)
 
   def mvDnLft(self) :
-    y = self.player.y + 1
-    x = self.player.x - 1
-    cell = self.cave.getCell(x, y)
-    if y < self.cave.height:
-      if cell.passable() or self.dig(x, y):
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveDL()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(-1, 1, self.player.moveDL)
 
   def mvDnRgt(self) :
-    y = self.player.y + 1
-    x = self.player.x + 1
-    cell = self.cave.getCell(x, y)
-    if y < self.cave.height and x < self.cave.width:
-      if cell.passable() or self.dig(x, y):
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        self.player.moveDR()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
+    self.mvPlayer(1, 1, self.player.moveDR)
 
   def dig(self, x, y):
 

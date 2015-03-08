@@ -9,4 +9,6 @@ class Player(Actor):
 
     self.needFovUpdate = True
 
+    self.falling = False
+
 
