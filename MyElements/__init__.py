@@ -1,1 +1,1 @@
-from MyMap import MyMap
+from MyMapElement import MyMapElement
