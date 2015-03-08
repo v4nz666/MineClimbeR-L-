@@ -34,7 +34,7 @@ class MenuState(GameState):
       ])
     )
 
-    self.generatingCave = self.view.addElement(Elements.Label(1, 1, "Generating Cave structure")).setDefaultColors(libtcod.green)
+    self.generatingCave = self.view.addElement(Elements.Label(1, 1, "Generating Cave")).setDefaultColors(libtcod.green)
     self.generatingCave.setDefaultColors(libtcod.green)\
       .hide()
     self.reticulating = self.view.addElement(Elements.Label(1, 2, "Reticulating Splines"))

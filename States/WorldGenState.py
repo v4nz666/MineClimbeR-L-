@@ -1,4 +1,5 @@
 import terrains
+from Item import itemTypes
 from random import randrange
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
@@ -35,6 +36,12 @@ class WorldGenState(GameState):
 
   def initCave(self):
     self.offset = self.minOffset
+
+    self._blank()
+    self._caGenerate()
+    self._placeOres()
+
+  def _blank(self):
     for y in range(self.caveH):
       for x in range(self.caveW):
         cell = self.map.getCell(x, y)
@@ -49,13 +56,14 @@ class WorldGenState(GameState):
         else:
           cell.setTerrain(terrains.caveWall)
 
+  def _caGenerate(self):
     caDigDensity = 0.4
     caNeighboursSpawn = 6
     caNeighboursStarve = 3
     caIterations = 5
-    
+
     digCount = self.caveW * self.caveH * caDigDensity
-    
+
     while digCount > 0:
       x = randrange(0, self.caveW - 1)
       y = randrange(0, self.caveH - 1)
@@ -63,9 +71,9 @@ class WorldGenState(GameState):
         continue
       c = self.map.getCell(x,y)
       if not c.passable():
-        digCount = digCount - 1
+        digCount -= 1
         c.setTerrain(terrains.openMine)
-    
+
     for i in range(caIterations):
       neighbours = [[None for _y in range(self.caveH)] for _x in range(self.caveW)]
       for y in range(self.caveH) :
@@ -85,6 +93,27 @@ class WorldGenState(GameState):
           else :
             if n <= caNeighboursStarve:
               c.setTerrain(terrains.openMine)
+
+  def _placeOres(self):
+    ores = [
+      itemTypes.Coal,
+      itemTypes.Tin,
+      itemTypes.Copper,
+      itemTypes.Iron,
+      itemTypes.Diamond
+    ]
+
+    for ore in ores:
+      placed = 0
+      while placed < ore.genCount:
+        genMin = int(self.caveH * ore.genMin)
+        genMax = int(self.caveH * ore.genMax)
+        x = randrange(self.caveW - 1)
+        y = randrange(genMin, genMax)
+        cell = self.map.getCell(x, y)
+        if len(cell.entities) == 0 and not cell.passable():
+          self.map.addEntity(ore, x, y)
+          placed += 1
 
   def countWallNeighbours(self, x, y) :
     n = 0
@@ -124,7 +153,7 @@ class WorldGenState(GameState):
         'ch': 'P',
         'fn': self.proceed
       },
-    })
+      })
 
   def scrollUp(self):
     if self.offset > self.minOffset:

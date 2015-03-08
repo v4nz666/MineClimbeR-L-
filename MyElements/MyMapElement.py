@@ -43,7 +43,7 @@ class MyMapElement(Elements.Map):
         c = self._map.getCell(x, y)
         if c.passable():
           self.seen[x][y] = True
-  
+
   def _initFovMap(self):
     self.fovMap = self._map._map
     for x in range(self._map.width):
