@@ -4,5 +4,4 @@ class HelpState(GameState):
 
 
   def tick(self):
-    print "Help"
     self._manager.setNextState('Menu')

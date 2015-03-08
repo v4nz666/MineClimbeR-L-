@@ -1,3 +1,4 @@
+from time import sleep
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
@@ -5,6 +6,10 @@ from RoguePy.State.GameState import GameState
 class MenuState(GameState):
   def __init__(self, name, manager, ui):
     super(MenuState, self).__init__(name, manager, ui)
+
+    self.mapReady = False
+    self.proceeding = 0
+
     self._setupView()
     self._setupInputs()
 
@@ -29,6 +34,21 @@ class MenuState(GameState):
       ])
     )
 
+    self.generatingCave = self.view.addElement(Elements.Label(1, 1, "Generating Cave structure")).setDefaultColors(libtcod.green)
+    self.generatingCave.setDefaultColors(libtcod.green)\
+      .hide()
+    self.reticulating = self.view.addElement(Elements.Label(1, 2, "Reticulating Splines"))
+    self.reticulating.setDefaultColors(libtcod.green)\
+      .hide()
+
+  def reset(self):
+    self.proceeding = 0
+    self.mapReady = False
+    self.setBlocking(True)
+    self.menu.show()
+    self.generatingCave.hide()
+    self.reticulating.hide()
+
 
   def _setupInputs(self):
     self.view.setInputs({
@@ -48,19 +68,36 @@ class MenuState(GameState):
         'fn': self.menu.selectFn
       },
     })
-    pass
 
+  def tick(self):
+    if self.proceeding == 1:
+      self.proceeding += 1
+      self.setBlocking(False)
+      self.menu.hide()
+      self.generatingCave.show()
+    elif self.proceeding == 2:
+      self.proceeding += 1
+      worldGenState = self._manager.getState('WorldGen')
+      worldGenState.initCave()
+      self.mapReady = True
+      self.reticulating.show()
+    elif self.proceeding == 3:
+      sleep(0.2)
+      self._manager.setNextState('WorldGen')
+    else:
+      pass
 
   ########
   # State Transitions
   def menuSelected(self, selected):
-    if selected == 0:
-      self._manager.setNextState('WorldGen')
-    elif selected == 1:
-      self._manager.setNextState('Help')
-    elif selected == 2:
-      self._manager.setNextState('About')
-    elif selected == 3:
-      self._manager.setNextState('Quit')
+    if not self.mapReady:
+      if selected == 0:
+        self.proceeding = 1
+      elif selected == 1:
+        self._manager.setNextState('Help')
+      elif selected == 2:
+        self._manager.setNextState('About')
+      elif selected == 3:
+        self._manager.setNextState('Quit')
   ########
 

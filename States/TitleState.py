@@ -9,12 +9,6 @@ class TitleState(GameState):
     self._setupView()
     self._setupInputs()
 
-
-
-  def tick(self):
-    print "Title"
-
-
   def _setupView(self):
     title = "The Mustached Archer"
     titleX = (self.view.width - len(title)) / 2
