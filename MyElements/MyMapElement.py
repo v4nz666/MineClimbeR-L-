@@ -49,11 +49,7 @@ class MyMapElement(Elements.Map):
     :param opacity: opacity to render the fog at
     :return: None
     """
-    # Above ground, don't worry about it
-    if y <= 5:
-      return
-    # Below ground, in torch
-    elif inTorch:
+    if inTorch:
       color = self.torchColor
       opacity = self.calculateIntensity(x, y)
     # Below ground, outside torch light, we'll render the fog of war

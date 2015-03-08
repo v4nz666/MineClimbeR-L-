@@ -1,5 +1,6 @@
 from Player import Player
 from MyElements import MyMapElement
+from Terrain import terrains
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
 
@@ -12,6 +13,8 @@ class PlayState(GameState):
     self.player = Player()
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
+
+    self.dug = None
 
 
   def tick(self):
@@ -196,7 +199,22 @@ class PlayState(GameState):
         self.cave.addEntity(self.player, self.player.x, self.player.y)
 
   def dig(self, x, y):
-    return True
+
+    cell = self.cave.getCell(x, y)
+    if self.dug == (x, y):
+      if y <= 5:
+        t = terrains.openAir
+      else:
+        t = terrains.openMine
+
+      cell.setTerrain(t)
+      libtcod.map_set_properties(self.mapElement.fovMap, x, y, True, True)
+      return True
+    else:
+      self.dug = (x, y)
+
+
+
 
 
 
