@@ -7,7 +7,7 @@ from RoguePy.UI.UI import UI
 FPS = 60
 UI_WIDTH = 105
 UI_HEIGHT = 60
-UI_FS = True
+UI_FS = False
 
 
 setFps(FPS)
@@ -16,7 +16,7 @@ ui = UI()
 ui.init(UI_WIDTH, UI_HEIGHT, UI_FS)
 
 # TODO: enable
-libtcod.console_credits()
+#libtcod.console_credits()
 
 stateManager = StateManager()
 

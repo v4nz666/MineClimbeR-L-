@@ -77,6 +77,7 @@ class WorldGenState(GameState):
           if y <= self.caveStartY:
             continue
           c = self.map.getCell(x, y)
+
           n = neighbours[x][y]
           if c.passable() :
             if n >= caNeighboursSpawn:
