@@ -8,6 +8,15 @@ class Actor(Item):
     self.y = None
     self.needFovUpdate = False
 
+    self.inventory = []
+
+  def pickupItem(self, item):
+    self.inventory.append(item)
+  def dropItem(self, item):
+    try:
+      self.inventory.remove(item)
+    except KeyError:
+      pass
 
   def setCoords(self, x, y):
     self.x = x

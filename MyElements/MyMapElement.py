@@ -6,11 +6,10 @@ from RoguePy.libtcod import libtcod
 class MyMapElement(Elements.Map):
 
   torchAlpha = 0.5
-  torchColor = libtcod.light_flame
+  torchColor = libtcod.darkest_flame * 0.5
 
   def __init__(self, x, y, w, h, _map):
     super(MyMapElement, self).__init__(x, y, w, h, _map)
-    self.overlay = libtcod.console_new(w, h)
     self._setupFog()
     self._initFovMap()
     self.player = None
@@ -19,9 +18,8 @@ class MyMapElement(Elements.Map):
     self.player = player
 
   def draw(self):
-    libtcod.console_clear(self.overlay)
-
-    fogOpacity = min(1, (1.0*self.player.y) / self._map.height)
+    baseOpacity = (1.0*self.player.y) / self._map.height
+    fogOpacity = min(1, 0.5 + (baseOpacity * 0.5))
     for onScreenY in range(self.height):
       mapY = onScreenY + self._offsetY
       for x in range(self.width):
@@ -49,7 +47,10 @@ class MyMapElement(Elements.Map):
     :param opacity: opacity to render the fog at
     :return: None
     """
-    if inTorch:
+    if y <= 5:
+      opacity = 0
+      color = libtcod.black
+    elif inTorch:
       color = self.torchColor
       opacity = self.calculateIntensity(x, y)
     # Below ground, outside torch light, we'll render the fog of war
@@ -65,7 +66,7 @@ class MyMapElement(Elements.Map):
       libtcod.console_set_char_background(self.console, x, y - self._offsetY, color, libtcod.BKGND_ADDALPHA(opacity))
 
   def calculateIntensity(self, x, y):
-    intensity = 1
+    intensity = 0
 
     deltaX = self.player.x - x
     deltaY = self.player.y - y
@@ -73,15 +74,8 @@ class MyMapElement(Elements.Map):
     distance = sqrt(pow(deltaX,2) + pow(deltaY, 2))
 
     if distance > 0:
-      intensity = 1 - pow(distance / self.player.torchStrength, 2)
-    return intensity / 4
-
-  def drawOverlay(self):
-    offset = self._offsetY * 1.0
-    #TODO calculate this once, and store in a list keyed by offset
-    opacity = offset / ( self._map.height - self.height )
-    opacity = min(1, 0.25 + (opacity * 3 / 4))
-    libtcod.console_blit(self.overlay, 0, 0, self.width, self.height, self.console, 0, 0, 0, opacity)
+      intensity = pow(distance / self.player.torchStrength, 2)
+    return intensity / 2
 
   def _setupFog(self):
     self.seen = [[False for _y in range(self._map.height)] for _x in range(self._map.width)]

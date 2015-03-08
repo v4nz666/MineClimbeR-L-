@@ -1,6 +1,7 @@
 from Player import Player
 from MyElements import MyMapElement
 from Terrain import terrains
+from Item.itemTypes import Anchor
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
 
@@ -79,11 +80,11 @@ class PlayState(GameState):
           'fn': self.mvDnRgt
         },
         
-        # 'toggleRope': {
-        #   'key': libtcod.KEY_SPACE,
-        #   'ch': None,
-        #   'fn': self.ropeToggle
-        # },
+        'toggleRope': {
+          'key': libtcod.KEY_SPACE,
+          'ch': None,
+          'fn': self.ropeToggle
+        },
         'proceed': {
           'key': libtcod.KEY_ESCAPE,
           'ch': None,
@@ -121,37 +122,69 @@ class PlayState(GameState):
     y = self.player.y + deltaY
     cell = self.cave.getCell(x, y)
     if x >= 0 and x < self.cave.width and y >= 0 and y < self.cave.height:
+
+
       if cell.passable() or self.dig(x, y):
+        if self.player.attached:
+          if not Anchor in self.player.inventory or y < 5:
+            return False
+          else:
+            self.cave.addEntity(Anchor, x, y)
+            self.player.dropItem(Anchor)
+
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
         playerFunc()
         self.cave.addEntity(self.player, self.player.x, self.player.y)
-        self.player.falling = self.cave.getCell(self.player.x, self.player.y + 1).passable()
+        self.player.falling = (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable()
+
+  def ropeToggle(self):
+    if self.player.attached:
+      self.player.detach()
+      self.player.falling = self.cave.getCell(self.player.x, self.player.y + 1).passable()
+    else:
+      self.player.anchorIn()
 
   ########
   # Input handlers
   def mvUp(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(0, -1, self.player.moveU)
 
   def mvDn(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(0, 1, self.player.moveD)
 
   def mvLft(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(-1, 0, self.player.moveL)
 
   def mvRgt(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(1, 0, self.player.moveR)
 
   def mvUpLft(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(-1, -1, self.player.moveUL)
 
   def mvUpRgt(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(1, -1, self.player.moveUR)
 
   def mvDnLft(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(-1, 1, self.player.moveDL)
 
   def mvDnRgt(self) :
+    if self.player.falling:
+      return
     self.mvPlayer(1, 1, self.player.moveDR)
 
   def dig(self, x, y):

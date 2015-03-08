@@ -39,3 +39,8 @@ Bronze.setColor(libtcod.Color(205, 127, 50))
 
 Steel = Ore('Steel')
 Steel.setColor(libtcod.Color(192, 192, 192))
+
+Anchor = Item('Climbing anchor')
+Anchor.setChar('"')
+Anchor.setColor(libtcod.silver)
+
