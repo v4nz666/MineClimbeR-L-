@@ -113,7 +113,7 @@ class PlayState(GameState):
     y = self.player.y - 1
     cell = self.cave.getCell(self.player.x, y)
     if y >= 0:
-      if cell.passable():
+      if cell.passable() or self.dig(self.player.x, y):
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
         self.player.moveU()
@@ -123,7 +123,7 @@ class PlayState(GameState):
     y = self.player.y + 1
     cell = self.cave.getCell(self.player.x, y)
     if y < self.cave.height:
-      if cell.passable():
+      if cell.passable() or self.dig(self.player.x, y):
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
         self.player.moveD()
@@ -133,7 +133,7 @@ class PlayState(GameState):
     x = self.player.x - 1
     cell = self.cave.getCell(x, self.player.y)
     if x >= 0:
-      if cell.passable():
+      if cell.passable() or self.dig(x, self.player.y):
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
         self.player.moveL()
@@ -143,7 +143,7 @@ class PlayState(GameState):
     x = self.player.x + 1
     cell = self.cave.getCell(x, self.player.y)
     if x < self.cave.width:
-      if cell.passable():
+      if cell.passable() or self.dig(x, self.player.y):
         print "moving right"
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
@@ -155,7 +155,7 @@ class PlayState(GameState):
     x = self.player.x - 1
     cell = self.cave.getCell(x, y)
     if y >= 0 and x >= 0:
-      if cell.passable():
+      if cell.passable() or self.dig(x, y):
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
         self.player.moveUL()
@@ -166,7 +166,7 @@ class PlayState(GameState):
     x = self.player.x + 1
     cell = self.cave.getCell(x, y)
     if y >= 0 and x < self.cave.width:
-      if cell.passable():
+      if cell.passable() or self.dig(x, y):
         print "moving up/right"
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
@@ -178,7 +178,7 @@ class PlayState(GameState):
     x = self.player.x - 1
     cell = self.cave.getCell(x, y)
     if y < self.cave.height:
-      if cell.passable():
+      if cell.passable() or self.dig(x, y):
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
         self.player.moveDL()
@@ -189,8 +189,14 @@ class PlayState(GameState):
     x = self.player.x + 1
     cell = self.cave.getCell(x, y)
     if y < self.cave.height and x < self.cave.width:
-      if cell.passable():
+      if cell.passable() or self.dig(x, y):
         oldCell = self.cave.getCell(self.player.x, self.player.y)
         oldCell.removeEntity(self.player)
         self.player.moveDR()
         self.cave.addEntity(self.player, self.player.x, self.player.y)
+
+  def dig(self, x, y):
+    return True
+
+
+

@@ -6,7 +6,7 @@ from RoguePy.libtcod import libtcod
 class MyMapElement(Elements.Map):
 
   torchAlpha = 0.5
-  torchColor = libtcod.desaturated_flame
+  torchColor = libtcod.light_flame
 
   def __init__(self, x, y, w, h, _map):
     super(MyMapElement, self).__init__(x, y, w, h, _map)
@@ -22,59 +22,63 @@ class MyMapElement(Elements.Map):
     libtcod.console_clear(self.overlay)
 
     fogOpacity = min(1, (1.0*self.player.y) / self._map.height)
-    for y in range(self.height):
+    for onScreenY in range(self.height):
+      mapY = onScreenY + self._offsetY
       for x in range(self.width):
-        c = self._map.getCell(x, y+self._offsetY)
-        libtcod.console_put_char_ex(self.console, x, y, c.terrain.char, c.terrain.fg, c.terrain.bg)
+        c = self._map.getCell(x, mapY)
+        inTorch = libtcod.map_is_in_fov(self._map._map, x, mapY)
 
-        visible = libtcod.map_is_in_fov(self._map._map, x, y + self._offsetY)
-        if visible:
+        libtcod.console_put_char_ex(self.console, x, onScreenY, c.terrain.char, c.terrain.fg, c.terrain.bg)
+        self.renderFovOverlay(c, x, mapY, fogOpacity, inTorch)
+
+        if inTorch:
+          self.seen[x][mapY] = True
           # Render the top item, if there are any here
           if len(c.entities) > 0:
             item = c.entities[len(c.entities)-1]
-            libtcod.console_put_char_ex(self.console, x, y, item.char, item.color, c.terrain.bg)
-        else:
-          self.renderFovOverlay(x, y, fogOpacity)
+            libtcod.console_put_char_ex(self.console, x, onScreenY, item.char, item.color, c.terrain.bg)
 
 
-  def renderFovOverlay(self, x, y, opacity):
+
+  def renderFovOverlay(self, cell, x, y, opacity, inTorch):
     """
     We'll only be called for coordinates outside the torch light, leaving a space where the torch reaches
 
-    :param x: onscreen x coord
-    :param y: onscreen y coord
+    :param x: on map x coord
+    :param y: on map y coord
     :param opacity: opacity to render the fog at
     :return: None
     """
-    cell = self._map.getCell(x, y + self._offsetY)
-
     # Above ground, don't worry about it
-    if y + self._offsetY <= 5:
+    if y <= 5:
       return
+    # Below ground, in torch
+    elif inTorch:
+      color = self.torchColor
+      opacity = self.calculateIntensity(x, y)
     # Below ground, outside torch light, we'll render the fog of war
     else:
-
       if not self.seen[x][y]:
         color = libtcod.black
         opacity = 1
       else:
         color = cell.terrain.bg
-    libtcod.console_put_char(self.console, x, y, ' ', libtcod.BKGND_ALPHA(opacity))
 
+    libtcod.console_put_char(self.console, x, y - self._offsetY, cell.terrain.char, libtcod.BKGND_ALPHA(opacity))
+    if inTorch:
+      libtcod.console_set_char_background(self.console, x, y - self._offsetY, color, libtcod.BKGND_ADDALPHA(opacity))
 
-  @staticmethod
-  def calculateIntensity(player, x, y):
+  def calculateIntensity(self, x, y):
     intensity = 1
 
-    deltaX = player.x - x
-    deltaY = player.y - y
+    deltaX = self.player.x - x
+    deltaY = self.player.y - y
 
     distance = sqrt(pow(deltaX,2) + pow(deltaY, 2))
 
     if distance > 0:
-      intensity = 1 - pow(distance / player.torchStrength, 2)
-      intensity = 1.0 / 4.0 + (3*intensity) / 4
-    return intensity
+      intensity = 1 - pow(distance / self.player.torchStrength, 2)
+    return intensity / 4
 
   def drawOverlay(self):
     offset = self._offsetY * 1.0

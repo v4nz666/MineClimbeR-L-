@@ -1,10 +1,12 @@
-import terrains
-from Item import itemTypes
 from random import randrange
+
+from Terrain import terrains
+from Item import itemTypes
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
 from RoguePy.Map.Map import Map
 from RoguePy.State.GameState import GameState
+
 
 class WorldGenState(GameState):
   def __init__(self, name, manager, ui):
