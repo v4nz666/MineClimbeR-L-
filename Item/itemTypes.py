@@ -43,9 +43,11 @@ Steel.setColor(libtcod.Color(192, 192, 192))
 Anchor = Item('Climbing anchor')
 Anchor.setChar('"')
 Anchor.setColor(libtcod.silver)
+Anchor.collectible = False
 
 Rope = Item('Rope')
 Rope.setChar('~')
 Rope.setColor(libtcod.crimson)
+Rope.collectible = False
 
 

@@ -6,6 +6,9 @@ class Actor(Item):
     super(Actor,self).__init__(name)
     self.x = None
     self.y = None
+
+    self.collectible = False
+
     self.needFovUpdate = False
 
     self.inventory = []

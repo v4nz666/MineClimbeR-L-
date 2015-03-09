@@ -12,6 +12,8 @@ class PlayState(GameState):
     super(PlayState, self).__init__(name, manager, ui)
     self._setupInputs()
 
+    self.cave = None
+
     self.player = Player()
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
@@ -31,8 +33,6 @@ class PlayState(GameState):
     if self.player.needFovUpdate:
       self.player.needFovUpdate = False
       self.mapElement.calculateFovMap()
-
-
 
   def setCave(self, cave):
     self.cave = cave
@@ -119,16 +119,16 @@ class PlayState(GameState):
   ########
 
   def mvPlayer(self, deltaX, deltaY, playerFunc):
-    x = self.player.x + deltaX
-    y = self.player.y + deltaY
-    cell = self.cave.getCell(x, y)
-    if not (x >= 0 and x < self.cave.width and y >= 0 and y < self.cave.height):
+    newX= self.player.x + deltaX
+    newY = self.player.y + deltaY
+    newCell = self.cave.getCell(newX, newY)
+    if not (newX >= 0 and newX < self.cave.width and newY >= 0 and newY < self.cave.height):
       return False
 
-    if cell.passable() or self.dig(x, y):
+    if newCell.passable() or self.dig(newX, newY):
       if self.player.attached:
-        if y <= 5:
-          #TODO this can probably just be removed, as long as toggleRope takes care of it
+        if newY <= 5:
+          # Can't climb out of the cave, if we're clipped in
           return False
         else:
           try:
@@ -137,39 +137,52 @@ class PlayState(GameState):
             lastRope = None
 
           # Going back the way we came - Retract the rope
-          if lastRope == (x,y):
+          if lastRope == (newX,newY):
             self.ropePath = self.ropePath[:-1]
             self.cave.getCell(self.player.x, self.player.y).removeEntity(Rope)
             self.player.pickupItem(Rope)
           # Have ropes left - extend the rope, placing an anchor if necessary
           elif Rope in self.player.inventory:
-            if not Anchor in cell.entities:
+            if not Anchor in newCell.entities:
               # No existing anchor, have some in inventory
               if Anchor in self.player.inventory:
-                self.cave.addEntity(Anchor, x, y)
+                self.cave.addEntity(Anchor, newX, newY)
                 self.player.dropItem(Anchor)
               # No existing anchor, none in inventory, we're not going anywhere
               else:
                 return False
 
-            self.ropePath.append((x, y))
-            self.cave.addEntity(Rope, x, y)
+            self.ropePath.append((newX, newY))
+            self.cave.addEntity(Rope, newX, newY)
             self.player.dropItem(Rope)
           else:
             # No Ropes left, trying to extend, can't proceed
             return False
 
 
-
+      #Remove player from previous cell
       oldCell = self.cave.getCell(self.player.x, self.player.y)
+      print "Removing player from " + str((self.player.x, self.player.y))
       oldCell.removeEntity(self.player)
+
+      # Update the player object's internal representation of its location
       playerFunc()
+
+      # Place the player in the nex cell, and collect any items
       self.cave.addEntity(self.player, self.player.x, self.player.y)
+      for i in newCell.entities:
+        try:
+          if i.collectible and i.collect(self.player):
+            newCell.removeEntity(i)
+        except ValueError:
+          pass
+
+      # Check if the space below is open, and fall if so
       self.player.falling = (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable()
 
   def ropeToggle(self):
     if self.player.attached:
-
+      # Remove the ropes from the cave
       for (x, y) in self.ropePath:
         self.cave.getCell(x, y).removeEntity(Rope)
       self.ropePath = []
