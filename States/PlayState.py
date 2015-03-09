@@ -335,6 +335,12 @@ class PlayState(GameState):
         t = terrains.openAir
       else:
         t = terrains.openMine
+
+      oldTerrain = cell.terrain
+      item = oldTerrain.itemDrop
+      if item:
+        cell.addEntity(item)
+
       cell.setTerrain(t)
       libtcod.map_set_properties(self.mapElement.fovMap, x, y, True, True)
       return True

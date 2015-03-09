@@ -64,7 +64,15 @@ class MyMapElement(Elements.Map):
       else:
         color = cell.terrain.bg
 
-    libtcod.console_put_char(self.console, x, y - self._offsetY, cell.terrain.char, libtcod.BKGND_ALPHA(opacity))
+    if inTorch and y > 5:
+      terrainChar = cell.terrain.char
+    else:
+      terrainChar = ' '
+
+    libtcod.console_put_char(self.console, x, y - self._offsetY, terrainChar, libtcod.BKGND_ALPHA(opacity))
+    libtcod.console_set_char_foreground(self.console, x, y - self._offsetY, cell.terrain.fg)
+
+
     if inTorch:
       libtcod.console_set_char_background(self.console, x, y - self._offsetY, color, libtcod.BKGND_ADDALPHA(opacity))
 
@@ -93,7 +101,7 @@ class MyMapElement(Elements.Map):
     for x in range(self._map.width):
       for y in range(self._map.height):
         c = self._map.getCell(x,y)
-        libtcod.map_set_properties(self.fovMap, x, y, c.passable(), c.transparent())
+        libtcod.map_set_properties(self.fovMap, x, y, c.transparent(), c.passable())
 
   def calculateFovMap(self):
     libtcod.map_compute_fov(

@@ -74,3 +74,6 @@ Venom = Item('Venom')
 Venom.setChar('!')
 Venom.setColor(libtcod.light_green)
 
+Wood = Item('Wood')
+Wood.setChar('-')
+Wood.setColor(libtcod.dark_orange)

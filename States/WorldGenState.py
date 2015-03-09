@@ -11,19 +11,21 @@ from RoguePy.State.GameState import GameState
 class WorldGenState(GameState):
   def __init__(self, name, manager, ui):
     super(WorldGenState, self).__init__(name, manager, ui)
-    self.map = None
+    self.cave = None
     self.caveW = self.view.width * 4 / 5
     self.caveH = self.view.height * 10
 
-    self.map = Map(self.caveW, self.caveH)
+    self.cave = Map(self.caveW, self.caveH)
 
     self.caveStartY = 5
     self.firstFrame = True
 
-    self.mapElement = self.view.addElement(Elements.Map(0, 0, self.caveW, self.view.height, self.map))
+    self.mapElement = self.view.addElement(Elements.Map(0, 0, self.caveW, self.view.height, self.cave))
     self.view.addElement(Elements.Label(self.caveW + 1, 2, "Up/Dn - Scroll"))
     self.view.addElement(Elements.Label(self.caveW + 1, 3, "R - Regenerate Mine"))
     self.view.addElement(Elements.Label(self.caveW + 1, 4, "P - Play this Mine"))
+    self.view.addElement(Elements.Label(self.caveW + 1, 5, "ESC - Back to Menu"))
+
 
     self.minOffset = self.mapElement.height / 2
     self.maxOffset = self.caveH - self.minOffset
@@ -42,11 +44,12 @@ class WorldGenState(GameState):
     self._blank()
     self._caGenerate()
     self._placeOres()
+    self._genWooden()
 
   def _blank(self):
     for y in range(self.caveH):
       for x in range(self.caveW):
-        cell = self.map.getCell(x, y)
+        cell = self.cave.getCell(x, y)
 
         if y < self.caveStartY:
           cell.setTerrain(terrains.openAir)
@@ -71,7 +74,7 @@ class WorldGenState(GameState):
       y = randrange(0, self.caveH - 1)
       if y < self.caveStartY + 3:
         continue
-      c = self.map.getCell(x,y)
+      c = self.cave.getCell(x,y)
       if not c.passable():
         digCount -= 1
         c.setTerrain(terrains.openMine)
@@ -86,7 +89,7 @@ class WorldGenState(GameState):
         for x in range(self.caveW) :
           if y <= self.caveStartY:
             continue
-          c = self.map.getCell(x, y)
+          c = self.cave.getCell(x, y)
 
           n = neighbours[x][y]
           if c.passable() :
@@ -95,6 +98,40 @@ class WorldGenState(GameState):
           else :
             if n <= caNeighboursStarve:
               c.setTerrain(terrains.openMine)
+
+  def _genWooden(self):
+    structureCount = 25
+    while structureCount:
+      x = randrange(1, self.caveW - 1)
+      y = randrange(6, self.caveH - 1)
+
+      # Not on solid ground
+      if self.cave.getCell(x-1, y+1).passable() or self.cave.getCell(x, y+1).passable() or self.cave.getCell(x+1, y+1).passable():
+        print "Not a solid base"
+        continue
+      elif not (self.cave.getCell(x-1, y).passable() and self.cave.getCell(x, y).passable() and self.cave.getCell(x+1, y).passable()):
+        print "Something blocking first row"
+        continue
+      elif not (self.cave.getCell(x-1, y-1).passable() and self.cave.getCell(x, y-1).passable() and self.cave.getCell(x+1, y-1).passable()):
+        print "Something blocking second row"
+        continue
+      elif not (self.cave.getCell(x-1, y-2).passable() and self.cave.getCell(x, y-2).passable() and self.cave.getCell(x+1, y-2).passable()):
+        print "Something blocking third row"
+        continue
+      else:
+        print "suitable sight found at : " + str((x,y))
+
+        self.cave.getCell(x-1,y).terrain = terrains.caveWoodPost
+        self.cave.getCell(x+1,y).terrain = terrains.caveWoodPost
+        self.cave.getCell(x-1,y-1).terrain = terrains.caveWoodPost
+        self.cave.getCell(x+1,y-1).terrain = terrains.caveWoodPost
+        self.cave.getCell(x-1,y-2).terrain = terrains.caveWoodBeam
+        self.cave.getCell(x,y-2).terrain = terrains.caveWoodBeam
+        self.cave.getCell(x+1,y-2).terrain = terrains.caveWoodBeam
+
+
+        structureCount -= 1
+
 
   def _placeOres(self):
     ores = [
@@ -112,9 +149,9 @@ class WorldGenState(GameState):
         genMax = int(self.caveH * ore.genMax)
         x = randrange(self.caveW - 1)
         y = randrange(genMin, genMax)
-        cell = self.map.getCell(x, y)
+        cell = self.cave.getCell(x, y)
         if len(cell.entities) == 0 and not cell.passable():
-          self.map.addEntity(ore, x, y)
+          self.cave.addEntity(ore, x, y)
           placed += 1
 
   def countWallNeighbours(self, x, y) :
@@ -124,7 +161,7 @@ class WorldGenState(GameState):
         if not _x and not _y:
           continue
         try:
-          c = self.map.getCell(x + _x, y + _y)
+          c = self.cave.getCell(x + _x, y + _y)
           if not c.passable() :
             n += 1
         except IndexError:
@@ -155,7 +192,12 @@ class WorldGenState(GameState):
         'ch': 'P',
         'fn': self.proceed
       },
-      })
+      'back': {
+        'key': libtcod.KEY_ESCAPE,
+        'ch': None,
+        'fn': self.backToMenu
+      },
+    })
 
   def scrollUp(self):
     if self.offset > self.minOffset:
@@ -167,5 +209,7 @@ class WorldGenState(GameState):
 
   def proceed(self):
     playState = self._manager.getState('Play')
-    playState.setCave(self.map)
+    playState.setCave(self.cave)
     self._manager.setNextState('Play')
+  def backToMenu(self):
+    self._manager.setNextState('Menu')

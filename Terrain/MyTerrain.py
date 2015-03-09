@@ -5,3 +5,9 @@ class MyTerrain(Terrain):
     Terrain.__init__(self, see, walk, desc)
     self.damage = 0
     self.hp = 2
+    # The item we'll drop when destroyed
+    self.itemDrop = None
+
+  def drops(self, item):
+    self.itemDrop = item
+    return self
