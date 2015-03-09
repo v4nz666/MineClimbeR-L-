@@ -46,8 +46,31 @@ Anchor.setColor(libtcod.silver)
 Anchor.collectible = False
 
 Rope = Item('Rope')
-Rope.setChar('~')
+Rope.setChar('%')
 Rope.setColor(libtcod.crimson)
 Rope.collectible = False
 
+String = Item('String')
+String.setChar('%')
+String.setColor(libtcod.light_crimson)
+
+Thread = Item('Thread')
+Thread.setChar('%')
+Thread.setColor(libtcod.lighter_crimson)
+
+Silk = Item('Spider Silk')
+Silk.setChar('%')
+Silk.setColor(libtcod.lightest_crimson)
+
+Water = Item('Water')
+Water.setChar('~')
+Water.setColor(libtcod.darker_blue)
+
+Arrow = Item('Arrow')
+Arrow.setChar('/')
+Arrow.setColor(libtcod.lightest_grey)
+
+Venom = Item('Venom')
+Venom.setChar('!')
+Venom.setColor(libtcod.light_green)
 

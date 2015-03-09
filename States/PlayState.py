@@ -1,4 +1,5 @@
 from Player import Player
+from RoguePy.UI import Elements
 from MyElements import MyMapElement
 from Terrain import terrains
 from Item.itemTypes import Anchor
@@ -10,7 +11,6 @@ class PlayState(GameState):
 
   def __init__(self, name, manager, ui):
     super(PlayState, self).__init__(name, manager, ui)
-    self._setupInputs()
 
     self.cave = None
 
@@ -33,10 +33,12 @@ class PlayState(GameState):
     if self.player.needFovUpdate:
       self.player.needFovUpdate = False
       self.mapElement.calculateFovMap()
+    self._updateUI()
 
   def setCave(self, cave):
     self.cave = cave
     self._setupView()
+    self._setupInputs()
     self.placePlayer()
 
   def _setupInputs(self):
@@ -86,12 +88,37 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.ropeToggle
       },
-      'proceed': {
+      'openCrafting': {
+        'key': libtcod.KEY_TAB,
+        'ch': None,
+        'fn': self.toggleCrafting
+      },
+      'quit': {
         'key': libtcod.KEY_ESCAPE,
         'ch': None,
-        'fn': self.proceed
+        'fn': self.quit
       }
     })
+    self.craftingModal.setInputs({
+      'closeModal': {
+        'key': libtcod.KEY_TAB,
+        'ch': None,
+        'fn': self.toggleCrafting
+      },
+    })
+    self.invList.setInputs({
+      'invUp': {
+        'key': libtcod.KEY_PAGEUP,
+        'ch': None,
+        'fn': self.invList.scrollUp
+      },
+      'invDn': {
+        'key': libtcod.KEY_PAGEDOWN,
+        'ch': None,
+        'fn': self.invList.scrollDown
+      }
+    })
+
 
   def placePlayer(self):
     playerX = 1
@@ -108,11 +135,68 @@ class PlayState(GameState):
         playerY += 1
 
   def _setupView(self):
+
+    # Most importantly, our Map Element
     self.mapElement = self.view.addElement(MyMapElement(0, 0, self.cave.width, self.view.height, self.cave))
-  
+
+    # Setup the right-hand pane
+    panelH = 12
+    panelW = self.view.width / 5
+    panelX =  self.view.width - panelW
+
+    sharedTl = libtcod.CHAR_TEEE
+    sharedTr = libtcod.CHAR_TEEW
+
+    self.statFrame = self.view.addElement(Elements.Frame(panelX, 0, panelW, panelH))\
+      .setTitle('Stats').setDefaultColors(libtcod.white, libtcod.darkest_azure)
+
+    invY = self.statFrame.y + self.statFrame.height - 1
+    self.invFrame = self.view.addElement(Elements.Frame(panelX, invY, panelW, panelH))\
+      .setTitle('Inv').setDefaultColors(libtcod.white, libtcod.darkest_azure)
+    self.invFrame._chars['tl'] = sharedTl
+    self.invFrame._chars['tr'] = sharedTr
+    self.invList = self.invFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 2))\
+      .setDefaultColors(libtcod.dark_green)
+    self.invList.bgOpacity = 0
+
+
+    helpY = self.invFrame.y + self.invFrame.height - 1
+    self.helpFrame = self.view.addElement(Elements.Frame(panelX, helpY, panelW, panelH))\
+      .setTitle('Commands').setDefaultColors(libtcod.white, libtcod.darkest_azure)
+    self.helpFrame._chars['tl'] = sharedTl
+    self.helpFrame._chars['tr'] = sharedTr
+
+    self.helpList = self.helpFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 3))\
+      .setDefaultColors(libtcod.lightest_blue)
+    self.defaultHelpItems = [
+      'NP 1-9:   Move/Wait',
+      'NP 0  :     Aim Bow',
+      'Spc   : Toggle Rope',
+      'Tab   :    Crafting',
+      'PgUp/Dn: Scroll Inv'
+
+    ]
+    self.helpItem = self.helpFrame.addElement(Elements.Label(1, panelH - 2, "? - Detailed Help"))\
+      .setDefaultColors(libtcod.gold)
+    self.helpItem.bgOpacity = 0
+
+    self.helpList.setItems(self.defaultHelpItems)
+    self.helpList.bgOpacity = 0
+
+    craftingX = self.view.width / 3
+    craftingW = self.view.width / 3
+    craftingY = self.view.height / 3
+    craftingH = self.view.height / 3
+
+    self.craftingModal = self.view.addElement(Elements.Modal(craftingX, craftingY, craftingW, craftingH))
+    self.craftingFrame = self.craftingModal.addElement(Elements.Frame(0, 0, craftingW, craftingH))\
+      .setTitle('Crafting')\
+      .setDefaultColors(libtcod.white, libtcod.darkest_azure)
+
+
   ########
   # State transitions
-  def proceed(self):
+  def quit(self):
     menuState = self._manager.getState('Menu')
     menuState.reset()
     self._manager.setNextState('Menu')
@@ -162,7 +246,6 @@ class PlayState(GameState):
 
       #Remove player from previous cell
       oldCell = self.cave.getCell(self.player.x, self.player.y)
-      print "Removing player from " + str((self.player.x, self.player.y))
       oldCell.removeEntity(self.player)
 
       # Update the player object's internal representation of its location
@@ -189,7 +272,7 @@ class PlayState(GameState):
       self.player.detach()
       self.player.falling = self.cave.getCell(self.player.x, self.player.y + 1).passable()
     else:
-      if self.player.y >= 5 and self.player.anchorIn():
+      if self.player.y > 5 and self.player.anchorIn():
         self.ropePath.append((self.player.x, self.player.y))
         self.cave.addEntity(Anchor, self.player.x, self.player.y)
         self.cave.addEntity(Rope, self.player.x, self.player.y)
@@ -237,6 +320,14 @@ class PlayState(GameState):
       return
     self.mvPlayer(1, 1, self.player.moveDR)
 
+  def toggleCrafting(self):
+    if not self.craftingModal.visible:
+      self.craftingModal.show(self.view)
+    else:
+      self.craftingModal.hide(self.view)
+
+  ########
+  # Map interactions
   def dig(self, x, y):
     cell = self.cave.getCell(x, y)
     if self.dug == (x, y):
@@ -250,9 +341,17 @@ class PlayState(GameState):
     else:
       self.dug = (x, y)
       return False
+  ########
 
-
-
-
-
+  ########
+  # View updates - per tick
+  def _updateUI(self):
+    invDict = {}
+    for i in self.player.inventory:
+      key = i.name
+      if key not in invDict:
+        invDict[key] = 0
+      invDict[key] += 1
+    invList = map(lambda key: key + ": " + str(invDict[key]),invDict)
+    self.invList.setItems(invList)
 

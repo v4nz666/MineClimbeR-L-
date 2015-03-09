@@ -18,8 +18,6 @@ class Item(Entity):
     inInv = player.inventory.count(self)
     if inInv < self.maxInv:
       player.pickupItem(self)
-      print "Item[" + self.name +"] collected"
-      print "Inventory" + str(player.inventory)
       return True
     return False
 

@@ -9,4 +9,4 @@ openWoodBeam = MyTerrain(True, False, "Wooden Beam").setColors(libtcod.dark_oran
 caveWoodPost = MyTerrain(True, False, "Wooden Post").setColors(libtcod.dark_orange, libtcod.light_grey)
 caveWoodBeam = MyTerrain(True, False, "Wooden Beam").setColors(libtcod.dark_orange, libtcod.light_grey)
 
-caveWall = MyTerrain(False, False, "Rock Wall").setColors(libtcod.darkest_grey, libtcod.darkest_grey)
+caveWall = MyTerrain(False, False, "Rock Wall").setColors(libtcod.darkest_grey, libtcod.darker_grey)
