@@ -1,1 +1,2 @@
 from MyMapElement import MyMapElement
+from HelpElement import HelpElement

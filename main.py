@@ -7,16 +7,19 @@ from RoguePy.UI.UI import UI
 FPS = 60
 UI_WIDTH = 105
 UI_HEIGHT = 60
-UI_FS = False
-
+UI_FONT_SIZE = 12
+UI_FSRES_X = UI_WIDTH * UI_FONT_SIZE
+UI_FSRES_Y = UI_HEIGHT * UI_FONT_SIZE
+UI_FS = True
 
 setFps(FPS)
+libtcod.sys_force_fullscreen_resolution(UI_FSRES_X, UI_FSRES_Y)
 
 ui = UI()
 ui.init(UI_WIDTH, UI_HEIGHT, UI_FS)
 
 # TODO: enable
-#libtcod.console_credits()
+libtcod.console_credits()
 
 stateManager = StateManager()
 

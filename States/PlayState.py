@@ -83,6 +83,11 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.mvDnRgt
       },
+      'wait': {
+        'key': libtcod.KEY_KP5,
+        'ch': None,
+        'fn': self.wait
+      },
       'toggleRope': {
         'key': libtcod.KEY_SPACE,
         'ch': None,
@@ -105,7 +110,7 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.toggleCrafting
       },
-    })
+      })
     self.invList.setInputs({
       'invUp': {
         'key': libtcod.KEY_PAGEUP,
@@ -147,26 +152,26 @@ class PlayState(GameState):
     sharedTl = libtcod.CHAR_TEEE
     sharedTr = libtcod.CHAR_TEEW
 
-    self.statFrame = self.view.addElement(Elements.Frame(panelX, 0, panelW, panelH))\
+    self.statFrame = self.view.addElement(Elements.Frame(panelX, 0, panelW, panelH)) \
       .setTitle('Stats').setDefaultColors(libtcod.white, libtcod.darkest_azure)
 
     invY = self.statFrame.y + self.statFrame.height - 1
-    self.invFrame = self.view.addElement(Elements.Frame(panelX, invY, panelW, panelH))\
+    self.invFrame = self.view.addElement(Elements.Frame(panelX, invY, panelW, panelH)) \
       .setTitle('Inv').setDefaultColors(libtcod.white, libtcod.darkest_azure)
     self.invFrame._chars['tl'] = sharedTl
     self.invFrame._chars['tr'] = sharedTr
-    self.invList = self.invFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 2))\
+    self.invList = self.invFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 2)) \
       .setDefaultColors(libtcod.dark_green)
     self.invList.bgOpacity = 0
 
 
     helpY = self.invFrame.y + self.invFrame.height - 1
-    self.helpFrame = self.view.addElement(Elements.Frame(panelX, helpY, panelW, panelH))\
+    self.helpFrame = self.view.addElement(Elements.Frame(panelX, helpY, panelW, panelH)) \
       .setTitle('Commands').setDefaultColors(libtcod.white, libtcod.darkest_azure)
     self.helpFrame._chars['tl'] = sharedTl
     self.helpFrame._chars['tr'] = sharedTr
 
-    self.helpList = self.helpFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 3))\
+    self.helpList = self.helpFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 3)) \
       .setDefaultColors(libtcod.lightest_blue)
     self.defaultHelpItems = [
       'NP 1-9:   Move/Wait',
@@ -176,7 +181,7 @@ class PlayState(GameState):
       'PgUp/Dn: Scroll Inv'
 
     ]
-    self.helpItem = self.helpFrame.addElement(Elements.Label(1, panelH - 2, "? - Detailed Help"))\
+    self.helpItem = self.helpFrame.addElement(Elements.Label(1, panelH - 2, "? - Detailed Help")) \
       .setDefaultColors(libtcod.gold)
     self.helpItem.bgOpacity = 0
 
@@ -189,8 +194,8 @@ class PlayState(GameState):
     craftingH = self.view.height / 3
 
     self.craftingModal = self.view.addElement(Elements.Modal(craftingX, craftingY, craftingW, craftingH))
-    self.craftingFrame = self.craftingModal.addElement(Elements.Frame(0, 0, craftingW, craftingH))\
-      .setTitle('Crafting')\
+    self.craftingFrame = self.craftingModal.addElement(Elements.Frame(0, 0, craftingW, craftingH)) \
+      .setTitle('Crafting') \
       .setDefaultColors(libtcod.white, libtcod.darkest_azure)
 
 
@@ -320,6 +325,9 @@ class PlayState(GameState):
       return
     self.mvPlayer(1, 1, self.player.moveDR)
 
+  def wait(self):
+    print "Waiting"
+
   def toggleCrafting(self):
     if not self.craftingModal.visible:
       self.craftingModal.show(self.view)
@@ -330,23 +338,17 @@ class PlayState(GameState):
   # Map interactions
   def dig(self, x, y):
     cell = self.cave.getCell(x, y)
-    if self.dug == (x, y):
-      if y <= 5:
-        t = terrains.openAir
-      else:
-        t = terrains.openMine
 
-      oldTerrain = cell.terrain
-      item = oldTerrain.itemDrop
-      if item:
-        cell.addEntity(item)
+    oldTerrain = cell.terrain
+    newTerrain = oldTerrain.digTerrain
+    cell.setTerrain(newTerrain)
 
-      cell.setTerrain(t)
-      libtcod.map_set_properties(self.mapElement.fovMap, x, y, True, True)
-      return True
-    else:
-      self.dug = (x, y)
-      return False
+    item = oldTerrain.itemDrop
+    if item:
+      cell.addEntity(item)
+
+    libtcod.map_set_properties(self.mapElement.fovMap, x, y, cell.transparent(), cell.passable())
+    return cell.passable()
   ########
 
   ########
