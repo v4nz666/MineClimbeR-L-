@@ -45,6 +45,8 @@ class WorldGenState(GameState):
     self._caGenerate()
     self._placeOres()
     self._genWooden()
+    self._genEntrance()
+
 
   def _blank(self):
     for y in range(self.caveH):
@@ -105,33 +107,44 @@ class WorldGenState(GameState):
       x = randrange(1, self.caveW - 1)
       y = randrange(6, self.caveH - 1)
 
-      # Not on solid ground
-      if self.cave.getCell(x-1, y+1).passable() or self.cave.getCell(x, y+1).passable() or self.cave.getCell(x+1, y+1).passable():
-        print "Not a solid base"
-        continue
-      elif not (self.cave.getCell(x-1, y).passable() and self.cave.getCell(x, y).passable() and self.cave.getCell(x+1, y).passable()):
-        print "Something blocking first row"
-        continue
-      elif not (self.cave.getCell(x-1, y-1).passable() and self.cave.getCell(x, y-1).passable() and self.cave.getCell(x+1, y-1).passable()):
-        print "Something blocking second row"
-        continue
-      elif not (self.cave.getCell(x-1, y-2).passable() and self.cave.getCell(x, y-2).passable() and self.cave.getCell(x+1, y-2).passable()):
-        print "Something blocking third row"
-        continue
-      else:
-        print "suitable sight found at : " + str((x,y))
-
-        self.cave.getCell(x-1,y).terrain = terrains.caveWoodPost
-        self.cave.getCell(x+1,y).terrain = terrains.caveWoodPost
-        self.cave.getCell(x-1,y-1).terrain = terrains.caveWoodPost
-        self.cave.getCell(x+1,y-1).terrain = terrains.caveWoodPost
-        self.cave.getCell(x-1,y-2).terrain = terrains.caveWoodBeam
-        self.cave.getCell(x,y-2).terrain = terrains.caveWoodBeam
-        self.cave.getCell(x+1,y-2).terrain = terrains.caveWoodBeam
-
-
+      if self._suitableSite(x, y):
+        self._placeWood(x, y, terrains.caveWoodPost, terrains.caveWoodBeam)
         structureCount -= 1
+  
+  def _genEntrance(self):
+    x = 0
+    y = 5
+    while True:
+      x = randrange(1, self.caveW - 1)
+      if self._suitableSite(x, y):
+        self._placeWood(x, y, terrains.openWoodPost, terrains.openWoodBeam)
+        break
+    y += 1
+    while not self.cave.getCell(x, y).passable():
+      self.cave.getCell(x, y).terrain = terrains.openMine
+      y += 1
 
+      
+  
+  def _suitableSite(self, x, y):
+  # Not on solid ground
+    if (self.cave.getCell(x-1, y+1).passable() or self.cave.getCell(x, y+1).passable() or self.cave.getCell(x+1, y+1).passable()) or\
+      not (self.cave.getCell(x-1, y).passable() and self.cave.getCell(x, y).passable() and self.cave.getCell(x+1, y).passable()) or\
+      not (self.cave.getCell(x-1, y-1).passable() and self.cave.getCell(x, y-1).passable() and self.cave.getCell(x+1, y-1).passable()) or\
+      not (self.cave.getCell(x-1, y-2).passable() and self.cave.getCell(x, y-2).passable() and self.cave.getCell(x+1, y-2).passable()):
+        return False
+    else:
+      return True
+
+
+  def _placeWood(self, x, y, post, beam):
+    self.cave.getCell(x-1,y).terrain = post
+    self.cave.getCell(x+1,y).terrain = post
+    self.cave.getCell(x-1,y-1).terrain = post
+    self.cave.getCell(x+1,y-1).terrain = post
+    self.cave.getCell(x-1,y-2).terrain = beam
+    self.cave.getCell(x,y-2).terrain = beam
+    self.cave.getCell(x+1,y-2).terrain = beam
 
   def _placeOres(self):
     ores = [
@@ -212,4 +225,7 @@ class WorldGenState(GameState):
     playState.setCave(self.cave)
     self._manager.setNextState('Play')
   def backToMenu(self):
+    menuState = self._manager.getState('Menu')
+    menuState.reset()
+    self._manager.setNextState('Menu')
     self._manager.setNextState('Menu')

@@ -43,7 +43,7 @@ class MyMapElement(Elements.Map):
 
   def renderFovOverlay(self, cell, x, y, opacity, inTorch):
     """
-    We'll only be called for coordinates outside the torch light, leaving a space where the torch reaches
+    Render the torch, and fog of war overlay for cell
 
     :param x: on map x coord
     :param y: on map y coord
@@ -52,19 +52,19 @@ class MyMapElement(Elements.Map):
     """
     if y <= 5:
       opacity = 0
-      color = libtcod.black
+      bgColor = cell.terrain.bg
     elif inTorch:
-      color = self.torchColor
+      bgColor = self.torchColor
       opacity = self.calculateIntensity(x, y)
     # Below ground, outside torch light, we'll render the fog of war
     else:
       if not self.seen[x][y]:
-        color = libtcod.black
+        bgColor = libtcod.black
         opacity = 1
       else:
-        color = cell.terrain.bg
+        bgColor = cell.terrain.bg
 
-    if inTorch and y > 5:
+    if inTorch or y <= 5:
       terrainChar = cell.terrain.char
     else:
       terrainChar = ' '
@@ -74,7 +74,7 @@ class MyMapElement(Elements.Map):
 
 
     if inTorch:
-      libtcod.console_set_char_background(self.console, x, y - self._offsetY, color, libtcod.BKGND_ADDALPHA(opacity))
+      libtcod.console_set_char_background(self.console, x, y - self._offsetY, bgColor, libtcod.BKGND_ADDALPHA(opacity))
 
   def calculateIntensity(self, x, y):
     intensity = 0
