@@ -44,3 +44,8 @@ Anchor = Item('Climbing anchor')
 Anchor.setChar('"')
 Anchor.setColor(libtcod.silver)
 
+Rope = Item('Rope')
+Rope.setChar('~')
+Rope.setColor(libtcod.crimson)
+
+

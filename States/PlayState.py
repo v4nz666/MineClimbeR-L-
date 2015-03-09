@@ -2,6 +2,7 @@ from Player import Player
 from MyElements import MyMapElement
 from Terrain import terrains
 from Item.itemTypes import Anchor
+from Item.itemTypes import Rope
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
 
@@ -15,6 +16,7 @@ class PlayState(GameState):
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
 
+    self.ropePath = []
     self.dug = None
 
 
@@ -40,57 +42,56 @@ class PlayState(GameState):
   def _setupInputs(self):
     self.view.setInputs({
       'mvUp': {
-          'key': libtcod.KEY_KP8,
-          'ch': None,
-          'fn': self.mvUp
-        },
-        'mvDn': {
-          'key': libtcod.KEY_KP2,
-          'ch': None,
-          'fn': self.mvDn
-        },
-        'mvRgt': {
-          'key': libtcod.KEY_KP6,
-          'ch': None,
-          'fn': self.mvRgt
-        },
-        'mvLft': {
-          'key': libtcod.KEY_KP4,
-          'ch': None,
-          'fn': self.mvLft
-        },
-        'mvUpLft': {
-          'key': libtcod.KEY_KP7,
-          'ch': None,
-          'fn': self.mvUpLft
-        },
-        'mvUpRgt': {
-          'key': libtcod.KEY_KP9,
-          'ch': None,
-          'fn': self.mvUpRgt
-        },
-        'mvDnLft': {
-          'key': libtcod.KEY_KP1,
-          'ch': None,
-          'fn': self.mvDnLft
-        },
-        'mvDnRgt': {
-          'key': libtcod.KEY_KP3,
-          'ch': None,
-          'fn': self.mvDnRgt
-        },
-        
-        'toggleRope': {
-          'key': libtcod.KEY_SPACE,
-          'ch': None,
-          'fn': self.ropeToggle
-        },
-        'proceed': {
-          'key': libtcod.KEY_ESCAPE,
-          'ch': None,
-          'fn': self.proceed
-        },
-      })
+        'key': libtcod.KEY_KP8,
+        'ch': None,
+        'fn': self.mvUp
+      },
+      'mvDn': {
+        'key': libtcod.KEY_KP2,
+        'ch': None,
+        'fn': self.mvDn
+      },
+      'mvRgt': {
+        'key': libtcod.KEY_KP6,
+        'ch': None,
+        'fn': self.mvRgt
+      },
+      'mvLft': {
+        'key': libtcod.KEY_KP4,
+        'ch': None,
+        'fn': self.mvLft
+      },
+      'mvUpLft': {
+        'key': libtcod.KEY_KP7,
+        'ch': None,
+        'fn': self.mvUpLft
+      },
+      'mvUpRgt': {
+        'key': libtcod.KEY_KP9,
+        'ch': None,
+        'fn': self.mvUpRgt
+      },
+      'mvDnLft': {
+        'key': libtcod.KEY_KP1,
+        'ch': None,
+        'fn': self.mvDnLft
+      },
+      'mvDnRgt': {
+        'key': libtcod.KEY_KP3,
+        'ch': None,
+        'fn': self.mvDnRgt
+      },
+      'toggleRope': {
+        'key': libtcod.KEY_SPACE,
+        'ch': None,
+        'fn': self.ropeToggle
+      },
+      'proceed': {
+        'key': libtcod.KEY_ESCAPE,
+        'ch': None,
+        'fn': self.proceed
+      }
+    })
 
   def placePlayer(self):
     playerX = 1
@@ -121,29 +122,65 @@ class PlayState(GameState):
     x = self.player.x + deltaX
     y = self.player.y + deltaY
     cell = self.cave.getCell(x, y)
-    if x >= 0 and x < self.cave.width and y >= 0 and y < self.cave.height:
+    if not (x >= 0 and x < self.cave.width and y >= 0 and y < self.cave.height):
+      return False
 
+    if cell.passable() or self.dig(x, y):
+      if self.player.attached:
+        if y <= 5:
+          #TODO this can probably just be removed, as long as toggleRope takes care of it
+          return False
+        else:
+          try:
+            lastRope = self.ropePath[-2]
+          except IndexError:
+            lastRope = None
 
-      if cell.passable() or self.dig(x, y):
-        if self.player.attached:
-          if not Anchor in self.player.inventory or y < 5:
-            return False
+          # Going back the way we came - Retract the rope
+          if lastRope == (x,y):
+            self.ropePath = self.ropePath[:-1]
+            self.cave.getCell(self.player.x, self.player.y).removeEntity(Rope)
+            self.player.pickupItem(Rope)
+          # Have ropes left - extend the rope, placing an anchor if necessary
+          elif Rope in self.player.inventory:
+            if not Anchor in cell.entities:
+              # No existing anchor, have some in inventory
+              if Anchor in self.player.inventory:
+                self.cave.addEntity(Anchor, x, y)
+                self.player.dropItem(Anchor)
+              # No existing anchor, none in inventory, we're not going anywhere
+              else:
+                return False
+
+            self.ropePath.append((x, y))
+            self.cave.addEntity(Rope, x, y)
+            self.player.dropItem(Rope)
           else:
-            self.cave.addEntity(Anchor, x, y)
-            self.player.dropItem(Anchor)
+            # No Ropes left, trying to extend, can't proceed
+            return False
 
-        oldCell = self.cave.getCell(self.player.x, self.player.y)
-        oldCell.removeEntity(self.player)
-        playerFunc()
-        self.cave.addEntity(self.player, self.player.x, self.player.y)
-        self.player.falling = (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable()
+
+
+      oldCell = self.cave.getCell(self.player.x, self.player.y)
+      oldCell.removeEntity(self.player)
+      playerFunc()
+      self.cave.addEntity(self.player, self.player.x, self.player.y)
+      self.player.falling = (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable()
 
   def ropeToggle(self):
     if self.player.attached:
+
+      for (x, y) in self.ropePath:
+        self.cave.getCell(x, y).removeEntity(Rope)
+      self.ropePath = []
       self.player.detach()
       self.player.falling = self.cave.getCell(self.player.x, self.player.y + 1).passable()
     else:
-      self.player.anchorIn()
+      if self.player.y >= 5 and self.player.anchorIn():
+        self.ropePath.append((self.player.x, self.player.y))
+        self.cave.addEntity(Anchor, self.player.x, self.player.y)
+        self.cave.addEntity(Rope, self.player.x, self.player.y)
+        self.player.dropItem(Rope)
 
   ########
   # Input handlers
@@ -188,19 +225,18 @@ class PlayState(GameState):
     self.mvPlayer(1, 1, self.player.moveDR)
 
   def dig(self, x, y):
-
     cell = self.cave.getCell(x, y)
     if self.dug == (x, y):
       if y <= 5:
         t = terrains.openAir
       else:
         t = terrains.openMine
-
       cell.setTerrain(t)
       libtcod.map_set_properties(self.mapElement.fovMap, x, y, True, True)
       return True
     else:
       self.dug = (x, y)
+      return False
 
 
 
