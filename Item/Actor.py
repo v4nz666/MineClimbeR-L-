@@ -13,10 +13,11 @@ class Actor(Item):
   def pickupItem(self, item):
     self.inventory.append(item)
   def dropItem(self, item):
-    try:
+    if not item in self.inventory:
+      return False
+    else:
       self.inventory.remove(item)
-    except KeyError:
-      pass
+      return True
 
   def setCoords(self, x, y):
     self.x = x

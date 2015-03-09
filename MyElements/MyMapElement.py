@@ -33,7 +33,10 @@ class MyMapElement(Elements.Map):
           self.seen[x][mapY] = True
           # Render the top item, if there are any here
           if len(c.entities) > 0:
-            item = c.entities[len(c.entities)-1]
+            if self.player in c.entities:
+              item = self.player
+            else:
+              item = c.entities[len(c.entities)-1]
             libtcod.console_put_char_ex(self.console, x, onScreenY, item.char, item.color, c.terrain.bg)
 
 
