@@ -39,14 +39,14 @@ class WorldGenState(GameState):
 
 
   def initCave(self):
-    self.offset = self.minOffset
+    self.offset = self.maxOffset #minOffset
 
     self._blank()
+    self._digDragonsDen()
     self._caGenerate()
     self._placeOres()
     self._genWooden()
     self._genEntrance()
-
 
   def _blank(self):
     for y in range(self.caveH):
@@ -62,6 +62,12 @@ class WorldGenState(GameState):
             cell.setTerrain(terrains.caveWall)
         else:
           cell.setTerrain(terrains.caveWall)
+
+
+  def _digDragonsDen(self):
+    for y in range(self.caveH - 10, self.caveH - 20, -1):
+      for x in range(5, self.caveW - 10):
+        self.cave.getCell(x, y).setTerrain(terrains.openMine)
 
   def _caGenerate(self):
     caDigDensity = 0.4
@@ -127,7 +133,6 @@ class WorldGenState(GameState):
       
   
   def _suitableSite(self, x, y):
-  # Not on solid ground
     if (self.cave.getCell(x-1, y+1).passable() or self.cave.getCell(x, y+1).passable() or self.cave.getCell(x+1, y+1).passable()) or\
       not (self.cave.getCell(x-1, y).passable() and self.cave.getCell(x, y).passable() and self.cave.getCell(x+1, y).passable()) or\
       not (self.cave.getCell(x-1, y-1).passable() and self.cave.getCell(x, y-1).passable() and self.cave.getCell(x+1, y-1).passable()) or\
