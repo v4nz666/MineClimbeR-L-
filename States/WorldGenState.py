@@ -38,7 +38,11 @@ class WorldGenState(GameState):
 
 
   def initCave(self):
-    self.offset = self.maxOffset
+
+    # Preview mine from top
+    self.offset = self.minOffset
+    # Preview mine from bottom
+    #self.offset = self.maxOffset
 
     self._blank()
     self._digDragonsDen()

@@ -1,5 +1,6 @@
 from math import sqrt
 from math import pow
+from Enemy import Enemy
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
 
@@ -31,13 +32,29 @@ class MyMapElement(Elements.Map):
 
         if inTorch:
           self.seen[x][mapY] = True
-          # Render the top item, if there are any here
           if len(c.entities) > 0:
+
+            # Take care of any spawners, while we're looping on the entities.
+            # This should definitely not live here, in the display layer :/
+            for e in c.entities:
+              if e.spawns:
+                enemy = Enemy(*e.spawns)
+                print "Spawning enemy: " + str(enemy.name) + " at " + str((x, mapY))
+                self._map.addEntity(enemy, x, mapY)
+                enemy.setCoords(x, mapY)
+
+
+            # Now that we've spawned any enemies, just remove any spawners that were in the list
+            c.entities = [e for e in c.entities if not e.spawns]
+
+            # Render the top item, if there are any here. Player takes precedence,though
             if self.player in c.entities:
               item = self.player
-            else:
-              item = c.entities[len(c.entities)-1]
+            elif len(c.entities) > 0:
+              item = c.entities[-1]
             libtcod.console_put_char_ex(self.console, x, onScreenY, item.char, item.color, c.terrain.bg)
+
+
 
 
 
