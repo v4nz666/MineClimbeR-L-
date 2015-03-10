@@ -10,7 +10,7 @@ UI_HEIGHT = 60
 UI_FONT_SIZE = 12
 UI_FSRES_X = UI_WIDTH * UI_FONT_SIZE
 UI_FSRES_Y = UI_HEIGHT * UI_FONT_SIZE
-UI_FS = True
+UI_FS = False
 
 setFps(FPS)
 libtcod.sys_force_fullscreen_resolution(UI_FSRES_X, UI_FSRES_Y)
@@ -19,7 +19,7 @@ ui = UI()
 ui.init(UI_WIDTH, UI_HEIGHT, UI_FS)
 
 # TODO: enable
-libtcod.console_credits()
+#libtcod.console_credits()
 
 stateManager = StateManager()
 
@@ -47,7 +47,7 @@ stateManager.addState(s_Help).setBlocking(True)
 stateManager.addState(s_About).setBlocking(True)
 stateManager.addState(s_Quit)
 
-stateManager.setCurrentState('Title')
+stateManager.setCurrentState('Menu')
 
 while not ui.is_closed():
   stateManager.doTick()
