@@ -19,6 +19,20 @@ class Actor(Item):
 
     self.inventory = []
 
+  def attackActor(self, target):
+    if target.dead():
+      return
+    rand = libtcod.random_new()
+    damage = libtcod.random_get_int(rand, 0, self.attack)
+    defend = libtcod.random_get_int(rand, 0, target.defend)
+
+    delta = damage - defend
+    if delta > 0:
+      target.health -= delta
+      print self.name + " hit " + target.name + " for[" + str(delta) + "]damage!"
+      print target.name + " has[" + str(target.health) + "]health left"
+
+
 
   def pickupItem(self, item):
     self.inventory.append(item)

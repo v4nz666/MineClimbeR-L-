@@ -42,7 +42,9 @@ class MyMapElement(Elements.Map):
                 print "Spawning enemy: " + str(enemy.name) + " at " + str((x, mapY))
                 enemy.setAi(e.spawns['ai'](self._map, enemy))
                 enemy.setMap(self._map)
-                enemy.maxPath = e.spawns['range']
+                enemy.maxPath = e.spawns['maxPath']
+                if 'range' in e.spawns:
+                  enemy.range = e.spawns['range']
                 self._map.addEntity(enemy, x, mapY)
                 enemy.setCoords(x, mapY)
                 self._map.addEnemy(enemy)

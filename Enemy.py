@@ -10,6 +10,7 @@ class Enemy(Actor):
     self.color = color
     self._ai = None
     self.maxPath = 10
+    self.range = 1
 
   def setAi(self, ai):
     self._ai = ai

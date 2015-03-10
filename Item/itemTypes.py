@@ -82,34 +82,35 @@ Wood.setColor(libtcod.dark_orange)
 
 
 BatDef = {
-  'args': ['Bat', '^', libtcod.darkest_grey, 1, 2, 2, 10],
+  'args': ['Bat', '^', libtcod.darkest_grey, 1, 3, 3, 10],
   'ai': BatAi,
-  'range': 15
+  'maxPath': 15,
 }
 SpiderDef = {
-  'args': ['Spider', 'x', libtcod.darker_sepia, 3, 2, 2, 8],
+  'args': ['Spider', 'x', libtcod.darker_sepia, 3, 4, 3, 8],
   'ai': SpiderAi,
-  'range': 10
+  'maxPath': 10,
 }
 SnakeDef = {
-  'args': ['Snake', 's', libtcod.dark_amber, 5, 4, 3, 5],
+  'args': ['Snake', 's', libtcod.dark_amber, 5, 5, 3, 5],
   'ai': SnakeAi,
-  'range': 5
+  'maxPath': 5,
 }
 GoblinDef = {
-  'args': ['Goblin', 'g', libtcod.han, 10, 6, 6, 5],
+  'args': ['Goblin', 'g', libtcod.han, 10, 8, 6, 5],
   'ai': GoblinAi,
-  'range': 15
+  'maxPath': 15,
 }
 TrollDef = {
-  'args': ['Troll', 'T', libtcod.yellow, 15, 8, 8, 2],
+  'args': ['Troll', 'T', libtcod.yellow, 15, 12, 12, 2],
   'ai': TrollAi,
-  'range': 20
+  'maxPath': 20,
 }
 DragonDef = {
   'args': ['Dragon', 'D', libtcod.dark_crimson, 50, 20, 25, 10],
   'ai': DragonAi,
-  'range': 50
+  'maxPath': 50,
+  'range': 5
 }
 
 

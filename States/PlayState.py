@@ -21,6 +21,8 @@ class PlayState(GameState):
     self.ropePath = []
     self.dug = None
 
+    self.turnTaken = False
+
 
   def tick(self):
     if self.player.dead():
@@ -33,7 +35,7 @@ class PlayState(GameState):
     if self.player.falling:
       if self.cave.getCell(self.player.x, self.player.y + 1).passable():
         self.player.fell += 1
-        self.mvPlayer(0, 1, self.player.moveD)
+        self.mvPlayer(0, 1, self.player.moveD, False)
       else:
         self.player.land()
     elif (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable():
@@ -47,13 +49,17 @@ class PlayState(GameState):
 
     ########
     # Turn -based updates
-    for e in self.cave.enemies:
-      if self.player.distance(e.x, e.y) <= e.maxPath:
-        e.aiMove()
-      else:
-        print "out of range"
+    if self.turnTaken:
+      for e in self.cave.enemies:
+        if self.player.distance(e.x, e.y) <= e.maxPath:
+          e.aiMove()
+          if self.player.dead():
+            return
+        else:
+          print "out of range"
 
     ########
+    self.turnTaken = False
 
 
   def setCave(self, cave):
@@ -235,7 +241,10 @@ class PlayState(GameState):
     self._manager.setNextState('Menu')
   ########
 
-  def mvPlayer(self, deltaX, deltaY, playerFunc):
+  def mvPlayer(self, deltaX, deltaY, playerFunc, turnTaken=True):
+
+    self.turnTaken = turnTaken
+
     newX= self.player.x + deltaX
     newY = self.player.y + deltaY
     newCell = self.cave.getCell(newX, newY)
@@ -243,6 +252,15 @@ class PlayState(GameState):
       return False
 
     if newCell.passable() or self.dig(newX, newY):
+      # If this is a legit move, then attack one enemy in the target cell
+      if turnTaken:
+        for e in self.cave.enemies:
+          if e.x == newX and e.y == newY:
+            self.player.attackActor(e)
+            if e.dead():
+              self.cave.removeEnemy(e)
+            return False
+
       if self.player.attached:
         if newY <= 5:
           # Can't climb out of the cave, if we're clipped in
@@ -351,6 +369,7 @@ class PlayState(GameState):
     self.mvPlayer(1, 1, self.player.moveDR)
 
   def wait(self):
+    self.turnTaken = True
     print "Waiting"
 
   def toggleCrafting(self):

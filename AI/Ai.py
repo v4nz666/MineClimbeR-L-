@@ -18,9 +18,8 @@ class Ai(object):
     pathSize = libtcod.path_size(self.path)
     if hasPath and pathSize > 0:
       (newX, newY) = libtcod.path_get(self.path, 0)
-      if pathSize == 1:
-        # print "Size 1. Attack!"
-        pass
+      if pathSize <= self.enemy.range:
+        self.enemy.attackActor(self.player)
       else:
         try:
           self.map.getCell(oldX, oldY).removeEntity(self.enemy)

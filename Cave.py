@@ -17,3 +17,4 @@ class Cave(Map):
   def removeEnemy(self, enemy):
     if enemy in self.enemies:
       self.enemies.remove(enemy)
+      self.getCell(enemy.x, enemy.y).removeEntity(enemy)
