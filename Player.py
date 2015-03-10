@@ -11,7 +11,7 @@ class Player(Actor):
     self.startingAnchors = 50
     self.ropeCount = 8
 
-    self.maxTorchStrength = 10
+    self.maxTorchStrength = 25
     self.torchStrength = self.maxTorchStrength
 
     self.needFovUpdate = True
@@ -26,9 +26,11 @@ class Player(Actor):
     self.inventory = [Anchor for i in range(self.startingAnchors)] + [Rope for i in range(self.ropeCount)]
 
   def anchorIn(self):
-    if Anchor in self.inventory:
+    hasAnchor = Anchor in self.map.getCell(self.x, self.y).entities
+    if Anchor in self.inventory or hasAnchor:
       self.attached = True
-      self.inventory.remove(Anchor)
+      if not hasAnchor:
+        self.inventory.remove(Anchor)
       self.falling = False
       self.fell = 0
       return True

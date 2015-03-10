@@ -1,3 +1,4 @@
+from math import sqrt
 from RoguePy.Map.Entity import Entity
 
 class Item(Entity):
@@ -17,6 +18,13 @@ class Item(Entity):
     # The type of entity that we'll spawn, when first encountered
     # ...This should probably live in a Spawner derivative class.
     self.spawns = None
+
+  def distance(self, x, y):
+    # return the linear distance to a point, from our point
+    dx = x - self.x
+    dy = y - self.y
+    distance = sqrt(dx ** 2 + dy ** 2)
+    return distance
 
   def collect(self, player):
     inInv = player.inventory.count(self)

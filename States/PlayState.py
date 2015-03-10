@@ -26,6 +26,8 @@ class PlayState(GameState):
     if self.player.dead():
       self.doDeathState()
 
+    ########
+    # Non-turn-based updates
     self.mapElement.center(self.player.x, self.player.y)
 
     if self.player.falling:
@@ -41,12 +43,25 @@ class PlayState(GameState):
       self.player.needFovUpdate = False
       self.mapElement.calculateFovMap()
     self._updateUI()
+    ########
+
+    ########
+    # Turn -based updates
+    for e in self.cave.enemies:
+      if self.player.distance(e.x, e.y) <= e.maxPath:
+        e.aiMove()
+      else:
+        print "out of range"
+
+    ########
+
 
   def setCave(self, cave):
     self.cave = cave
     self._setupView()
     self._setupInputs()
     self.placePlayer()
+    self.player.setMap(cave)
 
   def _setupInputs(self):
     self.view.setInputs({
@@ -162,6 +177,10 @@ class PlayState(GameState):
     self.statFrame = self.view.addElement(Elements.Frame(panelX, 0, panelW, panelH)) \
       .setTitle('Stats').setDefaultColors(libtcod.white, libtcod.darkest_azure)
 
+    self.fps = self.statFrame.addElement(Elements.Label(1, 1, 'FPS:   '))
+    self.fps.setDefaultColors(libtcod.magenta)
+    self.fps.bgOpacity = 0
+
     invY = self.statFrame.y + self.statFrame.height - 1
     self.invFrame = self.view.addElement(Elements.Frame(panelX, invY, panelW, panelH)) \
       .setTitle('Inv').setDefaultColors(libtcod.white, libtcod.darkest_azure)
@@ -170,7 +189,6 @@ class PlayState(GameState):
     self.invList = self.invFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 2)) \
       .setDefaultColors(libtcod.dark_green)
     self.invList.bgOpacity = 0
-
 
     helpY = self.invFrame.y + self.invFrame.height - 1
     self.helpFrame = self.view.addElement(Elements.Frame(panelX, helpY, panelW, panelH)) \
@@ -369,4 +387,9 @@ class PlayState(GameState):
       invDict[key] += 1
     invList = map(lambda key: key + ": " + str(invDict[key]),invDict)
     self.invList.setItems(invList)
+    self.fps.setLabel('FPS: ' + str(libtcod.sys_get_fps()))
+    self.fps.setDefaultColors(libtcod.magenta)
+
+
+
 

@@ -1,5 +1,6 @@
 from Ore import Ore
 from Item import Item
+from AI import *
 #from enemies import *
 from RoguePy.libtcod import libtcod
 
@@ -80,53 +81,96 @@ Wood.setChar('-')
 Wood.setColor(libtcod.dark_orange)
 
 
-BatDef = ['Bat', '^', libtcod.darkest_grey, 1, 2, 2, 10]
-SpiderDef = ['Spider', 'x', libtcod.darker_sepia, 3, 2, 2, 8]
-SnakeDef = ['Snake', 's', libtcod.dark_amber, 5, 4, 3, 5]
-GoblinDef = ['Goblin', 'g', libtcod.han, 10, 6, 6, 5]
-TrollDef = ['Troll', 'T', libtcod.yellow, 15, 8, 8, 2]
-DragonDef = ['Dragon', 'D', libtcod.dark_crimson, 50, 20, 25, 10]
+BatDef = {
+  'args': ['Bat', '^', libtcod.darkest_grey, 1, 2, 2, 10],
+  'ai': BatAi,
+  'range': 15
+}
+SpiderDef = {
+  'args': ['Spider', 'x', libtcod.darker_sepia, 3, 2, 2, 8],
+  'ai': SpiderAi,
+  'range': 10
+}
+SnakeDef = {
+  'args': ['Snake', 's', libtcod.dark_amber, 5, 4, 3, 5],
+  'ai': SnakeAi,
+  'range': 5
+}
+GoblinDef = {
+  'args': ['Goblin', 'g', libtcod.han, 10, 6, 6, 5],
+  'ai': GoblinAi,
+  'range': 15
+}
+TrollDef = {
+  'args': ['Troll', 'T', libtcod.yellow, 15, 8, 8, 2],
+  'ai': TrollAi,
+  'range': 20
+}
+DragonDef = {
+  'args': ['Dragon', 'D', libtcod.dark_crimson, 50, 20, 25, 10],
+  'ai': DragonAi,
+  'range': 50
+}
 
 
 BatSpawner = Item('')
 BatSpawner.genCount = 30
 BatSpawner.genMin = 0.05
 BatSpawner.genMax = 0.75
+# BatSpawner.genCount = 30
+# BatSpawner.genMin = 0.05
+# BatSpawner.genMax = 0.75
 BatSpawner.collectible = False
 BatSpawner.spawns = BatDef
+
 
 SpiderSpawner = Item('')
 SpiderSpawner.genCount = 15
 SpiderSpawner.genMin = 0.0
-SpiderSpawner.genMax = 0.60
+SpiderSpawner.genMax = 0.20
+# SpiderSpawner.genCount = 15
+# SpiderSpawner.genMin = 0.0
+# SpiderSpawner.genMax = 0.60
 SpiderSpawner.collectible = False
 SpiderSpawner.spawns = SpiderDef
 
 SnakeSpawner = Item('')
 SnakeSpawner.genCount = 5
 SnakeSpawner.genMin = 0.0
-SnakeSpawner.genMax = 0.25
+SnakeSpawner.genMax = 0.2
+# SnakeSpawner.genCount = 5
+# SnakeSpawner.genMin = 0.0
+# SnakeSpawner.genMax = 0.25
 SnakeSpawner.collectible = False
 SnakeSpawner.spawns = SnakeDef
 
 GoblinSpawner = Item('')
 GoblinSpawner.genCount = 15
-GoblinSpawner.genMin = 0.5
-GoblinSpawner.genMax = 0.8
+GoblinSpawner.genMin = 0
+GoblinSpawner.genMax = 0.2
+# GoblinSpawner.genCount = 15
+# GoblinSpawner.genMin = 0.5
+# GoblinSpawner.genMax = 0.8
 GoblinSpawner.collectible = False
 GoblinSpawner.spawns = GoblinDef
 
 TrollSpawner = Item('')
 TrollSpawner.genCount = 10
-TrollSpawner.genMin = 0.65
-TrollSpawner.genMax = 0.9
+TrollSpawner.genMin = 0
+TrollSpawner.genMax = 0.2
+# TrollSpawner.genCount = 10
+# TrollSpawner.genMin = 0.65
+# TrollSpawner.genMax = 0.9
 TrollSpawner.collectible = False
 TrollSpawner.spawns = TrollDef
 
 DragonSpawner = Item('')
 DragonSpawner.genCount = 1
-DragonSpawner.genMin = 0.95
-DragonSpawner.genMax = 1.0
+DragonSpawner.genMin = 0
+DragonSpawner.genMax = 0.05
+# DragonSpawner.genCount = 1
+# DragonSpawner.genMin = 0.95
+# DragonSpawner.genMax = 1.0
 DragonSpawner.collectible = False
 DragonSpawner.spawns = DragonDef
 

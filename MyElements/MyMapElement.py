@@ -38,10 +38,14 @@ class MyMapElement(Elements.Map):
             # This should definitely not live here, in the display layer :/
             for e in c.entities:
               if e.spawns:
-                enemy = Enemy(*e.spawns)
+                enemy = Enemy(self.player, *e.spawns['args'])
                 print "Spawning enemy: " + str(enemy.name) + " at " + str((x, mapY))
+                enemy.setAi(e.spawns['ai'](self._map, enemy))
+                enemy.setMap(self._map)
+                enemy.maxPath = e.spawns['range']
                 self._map.addEntity(enemy, x, mapY)
                 enemy.setCoords(x, mapY)
+                self._map.addEnemy(enemy)
 
 
             # Now that we've spawned any enemies, just remove any spawners that were in the list

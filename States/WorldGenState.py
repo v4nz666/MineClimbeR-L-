@@ -4,7 +4,7 @@ from Terrain import terrains
 from Item import itemTypes
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
-from RoguePy.Map.Map import Map
+from Cave import Cave
 from RoguePy.State.GameState import GameState
 
 
@@ -15,7 +15,7 @@ class WorldGenState(GameState):
     self.caveW = self.view.width * 4 / 5
     self.caveH = self.view.height * 10
 
-    self.cave = Map(self.caveW, self.caveH)
+    self.cave = Cave(self.caveW, self.caveH)
 
     self.caveStartY = 5
 
@@ -44,6 +44,7 @@ class WorldGenState(GameState):
     # Preview mine from bottom
     #self.offset = self.maxOffset
 
+    self.cave.reset()
     self._blank()
     self._digDragonsDen()
     self._caGenerate()
