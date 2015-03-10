@@ -23,12 +23,19 @@ class PlayState(GameState):
 
 
   def tick(self):
+    if self.player.dead():
+      self.doDeathState()
+
     self.mapElement.center(self.player.x, self.player.y)
+
     if self.player.falling:
       if self.cave.getCell(self.player.x, self.player.y + 1).passable():
+        self.player.fell += 1
         self.mvPlayer(0, 1, self.player.moveD)
       else:
-        self.player.falling = False
+        self.player.land()
+    elif (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable():
+      self.player.falling = True
 
     if self.player.needFovUpdate:
       self.player.needFovUpdate = False
@@ -201,6 +208,9 @@ class PlayState(GameState):
 
   ########
   # State transitions
+  def doDeathState(self):
+    self._manager.setNextState('Death')
+
   def quit(self):
     menuState = self._manager.getState('Menu')
     menuState.reset()
@@ -264,9 +274,6 @@ class PlayState(GameState):
             newCell.removeEntity(i)
         except ValueError:
           pass
-
-      # Check if the space below is open, and fall if so
-      self.player.falling = (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable()
 
   def ropeToggle(self):
     if self.player.attached:

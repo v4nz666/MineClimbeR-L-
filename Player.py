@@ -6,7 +6,7 @@ class Player(Actor):
 
 
   def __init__(self, name="You"):
-    super(Player, self).__init__(name)
+    super(Player, self).__init__(name, 100, 10, 10)
 
     self.startingAnchors = 50
     self.ropeCount = 8
@@ -16,7 +16,11 @@ class Player(Actor):
 
     self.needFovUpdate = True
 
+    self.fell = 0
     self.falling = False
+    self.fallDamage = 2
+    self.maxFallHeight = 2
+
     self.attached = False
 
     self.inventory = [Anchor for i in range(self.startingAnchors)] + [Rope for i in range(self.ropeCount)]
@@ -25,7 +29,8 @@ class Player(Actor):
     if Anchor in self.inventory:
       self.attached = True
       self.inventory.remove(Anchor)
-
+      self.falling = False
+      self.fell = 0
       return True
     else:
       return False
@@ -34,3 +39,9 @@ class Player(Actor):
     self.inventory += [Rope for i in range(self.ropeCount - self.inventory.count(Rope))]
     self.attached = False
 
+  def land(self):
+    if self.fell > self.maxFallHeight:
+      delta = pow(self.fallDamage, self.fell - self.maxFallHeight)
+      self.health -= delta
+    self.falling = False
+    self.fell = 0

@@ -18,7 +18,6 @@ class WorldGenState(GameState):
     self.cave = Map(self.caveW, self.caveH)
 
     self.caveStartY = 5
-    self.firstFrame = True
 
     self.mapElement = self.view.addElement(Elements.Map(0, 0, self.caveW, self.view.height, self.cave))
     self.view.addElement(Elements.Label(self.caveW + 1, 2, "Up/Dn - Scroll"))
@@ -39,24 +38,24 @@ class WorldGenState(GameState):
 
 
   def initCave(self):
-    self.offset = self.maxOffset #minOffset
+    self.offset = self.maxOffset
 
     self._blank()
     self._digDragonsDen()
     self._caGenerate()
-    self._placeOres()
     self._genWooden()
     self._genEntrance()
+    self._genEntities()
 
   def _blank(self):
     for y in range(self.caveH):
       for x in range(self.caveW):
         cell = self.cave.getCell(x, y)
-
+        cell.entities = []
         if y < self.caveStartY:
           cell.setTerrain(terrains.openAir)
         elif y == self.caveStartY:
-          if randrange(100) < 50:
+          if randrange(100) < 75:
             cell.setTerrain(terrains.openAir)
           else:
             cell.setTerrain(terrains.caveWall)
@@ -118,10 +117,9 @@ class WorldGenState(GameState):
         structureCount -= 1
   
   def _genEntrance(self):
-    x = 0
-    y = 5
+    y = self.caveStartY
     while True:
-      x = randrange(1, self.caveW - 1)
+      x = randrange(3, self.caveW - 3)
       if self._suitableSite(x, y):
         self._placeWood(x, y, terrains.openWoodPost, terrains.openWoodBeam)
         break
@@ -130,8 +128,6 @@ class WorldGenState(GameState):
       self.cave.getCell(x, y).terrain = terrains.openMine
       y += 1
 
-      
-  
   def _suitableSite(self, x, y):
     if (self.cave.getCell(x-1, y+1).passable() or self.cave.getCell(x, y+1).passable() or self.cave.getCell(x+1, y+1).passable()) or\
       not (self.cave.getCell(x-1, y).passable() and self.cave.getCell(x, y).passable() and self.cave.getCell(x+1, y).passable()) or\
@@ -151,26 +147,45 @@ class WorldGenState(GameState):
     self.cave.getCell(x,y-2).terrain = beam
     self.cave.getCell(x+1,y-2).terrain = beam
 
-  def _placeOres(self):
-    ores = [
-      itemTypes.Coal,
-      itemTypes.Tin,
-      itemTypes.Copper,
-      itemTypes.Iron,
-      itemTypes.Diamond
-    ]
+  def _genEntities(self):
+    entities = {
+      itemTypes.Coal: True,
+      itemTypes.Tin: True,
+      itemTypes.Copper: True,
+      itemTypes.Iron: True,
+      itemTypes.Diamond: True,
+      itemTypes.BatSpawner: False,
+      itemTypes.SpiderSpawner: False,
+      itemTypes.SnakeSpawner: False,
+      itemTypes.GoblinSpawner: False,
+      itemTypes.TrollSpawner: False,
+      itemTypes.DragonSpawner: False
+    }
 
-    for ore in ores:
+    for entity in entities:
+      inWall = entities[entity]
       placed = 0
-      while placed < ore.genCount:
-        genMin = int(self.caveH * ore.genMin)
-        genMax = int(self.caveH * ore.genMax)
+      while placed < entity.genCount:
+        genMin = int(self.caveH * entity.genMin)
+        genMax = int(self.caveH * entity.genMax)
         x = randrange(self.caveW - 1)
         y = randrange(genMin, genMax)
         cell = self.cave.getCell(x, y)
-        if len(cell.entities) == 0 and not cell.passable():
-          self.cave.addEntity(ore, x, y)
-          placed += 1
+
+        # We've already got one
+        if entity in cell.entities:
+          continue
+        # Not in a cave wall, when we should be, or vice versa
+        if inWall == cell.passable() or inWall == cell.transparent():
+          continue
+        # Too close to the bottom
+        if y >= self.caveH - 1:
+          continue
+        # Out in the open, and no floor below (forces non inWall items to be on the ground, no effect on inWall items)
+        if cell.passable() and self.cave.getCell(x, y+1).passable():
+          continue
+        self.cave.addEntity(entity, x, y)
+        placed += 1
 
   def countWallNeighbours(self, x, y) :
     n = 0

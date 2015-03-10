@@ -1,5 +1,6 @@
 from Ore import Ore
 from Item import Item
+from Actor import Actor
 from RoguePy.libtcod import libtcod
 
 Tin = Ore('Tin')
@@ -77,3 +78,54 @@ Venom.setColor(libtcod.light_green)
 Wood = Item('Wood')
 Wood.setChar('-')
 Wood.setColor(libtcod.dark_orange)
+
+BatSpawner = Item('')
+BatSpawner.genCount = 30
+BatSpawner.genMin = 0.05
+BatSpawner.genMax = 0.75
+BatSpawner.collectible = False
+
+SpiderSpawner = Item('')
+SpiderSpawner.genCount = 15
+SpiderSpawner.genMin = 0.0
+SpiderSpawner.genMax = 0.60
+SpiderSpawner.collectible = False
+
+SnakeSpawner = Item('')
+SnakeSpawner.genCount = 5
+SnakeSpawner.genMin = 0.0
+SnakeSpawner.genMax = 0.25
+SnakeSpawner.collectible = False
+
+GoblinSpawner = Item('')
+GoblinSpawner.genCount = 15
+GoblinSpawner.genMin = 0.5
+GoblinSpawner.genMax = 0.8
+GoblinSpawner.collectible = False
+
+TrollSpawner = Item('')
+TrollSpawner.genCount = 10
+TrollSpawner.genMin = 0.65
+TrollSpawner.genMax = 0.9
+TrollSpawner.collectible = False
+
+DragonSpawner = Item('')
+DragonSpawner.genCount = 1
+DragonSpawner.genMin = 0.95
+DragonSpawner.genMax = 1.0
+DragonSpawner.collectible = False
+
+#TODO Remove
+BatSpawner.setChar('^')
+BatSpawner.setColor(libtcod.white)
+SpiderSpawner.setChar('x')
+SpiderSpawner.setColor(libtcod.white)
+SnakeSpawner.setChar('s')
+SnakeSpawner.setColor(libtcod.white)
+GoblinSpawner.setChar('g')
+GoblinSpawner.setColor(libtcod.white)
+TrollSpawner.setChar('T')
+TrollSpawner.setColor(libtcod.white)
+DragonSpawner.setChar('D')
+DragonSpawner.setColor(libtcod.white)
+# End TODO

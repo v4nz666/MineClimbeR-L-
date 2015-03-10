@@ -2,16 +2,22 @@ from RoguePy.libtcod import libtcod
 from Item import Item
 
 class Actor(Item):
-  def __init__(self, name):
+  def __init__(self, name, maxHealth, attack=0 , defend=0):
     super(Actor,self).__init__(name)
+
+    self.maxHealth = maxHealth
+    self.health = maxHealth
+    self.attack = attack
+    self.defend = defend
+
     self.x = None
     self.y = None
-
     self.collectible = False
-
     self.needFovUpdate = False
 
     self.inventory = []
+
+    self.health
 
   def pickupItem(self, item):
     self.inventory.append(item)
@@ -21,6 +27,9 @@ class Actor(Item):
     else:
       self.inventory.remove(item)
       return True
+
+  def dead(self):
+    return self.health <= 0
 
   def setCoords(self, x, y):
     self.x = x
