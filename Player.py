@@ -29,7 +29,7 @@ class Player(Actor):
     self.inventory = [Anchor for i in range(self.startingAnchors)] + [Rope for i in range(self.ropeCount)]
 
   def collectPick(self, pick):
-    self.maxPickStrength = pick.material.multiplier * self.basePickStrength
+    self.maxPickStrength = int(pick.material.multiplier * self.basePickStrength)
     self.pickStrength = self.maxPickStrength
 
   def damagePick(self):

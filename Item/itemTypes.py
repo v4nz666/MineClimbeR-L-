@@ -73,6 +73,14 @@ Silk.setColor(libtcod.lightest_crimson)
 Water = Item('Water')
 Water.setChar('~')
 Water.setColor(libtcod.darker_blue)
+Water.genCount = 50
+Water.genMin = 0.05
+Water.genMax = 0.95
+
+def collectWater(player):
+  player.health = min(player.maxHealth, player.health + 25)
+  return True
+Water.collect = collectWater
 
 Arrow = Item('Arrow')
 Arrow.setChar('/')

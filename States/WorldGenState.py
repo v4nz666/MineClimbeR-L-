@@ -159,6 +159,7 @@ class WorldGenState(GameState):
       itemTypes.Copper: True,
       itemTypes.Iron: True,
       itemTypes.Diamond: True,
+      itemTypes.Water: False,
       itemTypes.BatSpawner: False,
       itemTypes.SpiderSpawner: False,
       itemTypes.SnakeSpawner: False,

@@ -65,7 +65,7 @@ class PlayState(GameState):
           if self.player.dead():
             return
         else:
-          print "out of range"
+          pass
 
     ########
     self.turnTaken = False
@@ -369,7 +369,6 @@ class PlayState(GameState):
 
   def wait(self):
     self.turnTaken = True
-    print "Waiting"
 
   def toggleCrafting(self):
     if not self.craftingModal.visible:
@@ -415,7 +414,6 @@ class PlayState(GameState):
     self.ropeLabel.bgOpacity = 0
     self.anchorLabel.setLabel("Anchors " + str(self.player.inventory.count(Anchor)))
     self.anchorLabel.bgOpacity = 0
-    print self.player.pickStrength
 
 
 
