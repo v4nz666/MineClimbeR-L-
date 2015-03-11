@@ -36,7 +36,7 @@ openWoodBeam = MyTerrain(True, False, "Wooden Beam")\
   .setColors(libtcod.dark_orange, libtcod.lighter_blue)\
   .setChar(libtcod.CHAR_DHLINE)\
   .digs(dugOpenWoodBeam)\
-  .burns(openBurningWood)\
+  .burns(openBurningWood)
 
 dugWoodPost = MyTerrain(True, False, "Wooden Post")\
   .setColors(libtcod.dark_orange, libtcod.light_grey)\
@@ -65,3 +65,7 @@ dugCaveWall = MyTerrain(False, False, "Rock Wall")\
 caveWall = MyTerrain(False, False, "Rock Wall")\
   .setColors(libtcod.darkest_grey, libtcod.darker_grey)\
   .digs(dugCaveWall)
+
+lava = MyTerrain(False, True, "Lava Pool")\
+  .setColors(libtcod.light_flame, libtcod.orange)\
+  .setChar('~')

@@ -42,12 +42,13 @@ class WorldGenState(GameState):
     # Preview mine from top
     self.offset = self.minOffset
     # Preview mine from bottom
-    #self.offset = self.maxOffset
+    # self.offset = self.maxOffset
 
     self.cave.reset()
     self._blank()
     self._digDragonsDen()
     self._caGenerate()
+    self._genLava()
     self._genWooden()
     self._genEntrance()
     self._genEntities()
@@ -115,7 +116,7 @@ class WorldGenState(GameState):
     structureCount = 25
     while structureCount:
       x = randrange(1, self.caveW - 1)
-      y = randrange(6, self.caveH - 1)
+      y = randrange(6, self.caveH - 25)
 
       if self._suitableSite(x, y):
         self._placeWood(x, y, terrains.caveWoodPost, terrains.caveWoodBeam)
@@ -193,6 +194,13 @@ class WorldGenState(GameState):
         self.cave.addEntity(entity, x, y)
         placed += 1
 
+  def _genLava(self):
+    for y in range(1, 7):
+      _y = self.caveH - y
+      for x in range(self.caveW):
+        cell = self.cave.getCell(x, _y)
+        if cell.passable():
+          cell.setTerrain(terrains.lava)
   def countWallNeighbours(self, x, y) :
     n = 0
     for _x in range ( -1, 2 ):

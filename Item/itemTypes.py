@@ -70,18 +70,6 @@ Silk = Item('Spider Silk')
 Silk.setChar('%')
 Silk.setColor(libtcod.lightest_crimson)
 
-Water = Item('Water')
-Water.setChar('~')
-Water.setColor(libtcod.darker_blue)
-Water.genCount = 50
-Water.genMin = 0.05
-Water.genMax = 0.95
-
-def collectWater(player):
-  player.health = min(player.maxHealth, player.health + 25)
-  return True
-Water.collect = collectWater
-
 Arrow = Item('Arrow')
 Arrow.setChar('/')
 Arrow.setColor(libtcod.lightest_grey)
@@ -95,6 +83,17 @@ Wood.setChar('-')
 Wood.setColor(libtcod.dark_orange)
 Wood.maxInv = 4
 
+Water = Item('Water')
+Water.setChar('~')
+Water.setColor(libtcod.darker_blue)
+Water.genCount = 50
+Water.genMin = 0.05
+Water.genMax = 0.95
+
+def collectWater(player):
+  player.health = min(player.maxHealth, player.health + 25)
+  return True
+Water.collect = collectWater
 ########
 # Tools
 TinPick = Item('Tin Pick')

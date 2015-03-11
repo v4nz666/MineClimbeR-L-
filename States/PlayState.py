@@ -4,6 +4,7 @@ from MyElements import MyMapElement
 from Item.itemTypes import Anchor
 from Item.itemTypes import Rope
 from Item.itemTypes import CopperPick
+from Terrain.terrains import lava
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
 
@@ -45,6 +46,7 @@ class PlayState(GameState):
         self.mvPlayer(0, 1, self.player.moveD, False)
       else:
         self.player.land()
+        self.turnTaken = True
     elif (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable():
       self.player.falling = True
 
@@ -293,22 +295,27 @@ class PlayState(GameState):
             # No Ropes left, trying to extend, can't proceed
             return False
 
-
       #Remove player from previous cell
       oldCell = self.cave.getCell(self.player.x, self.player.y)
       oldCell.removeEntity(self.player)
 
-      # Update the player object's internal representation of its location
-      playerFunc()
+      if newCell.terrain == lava:
+        self.player.health = 0
+        return False
 
-      # Place the player in the nex cell, and collect any items
-      self.cave.addEntity(self.player, self.player.x, self.player.y)
+      # Collect any items in the new cell
       for i in newCell.entities:
         try:
           if i.collectible and i.collect(self.player):
             newCell.removeEntity(i)
         except ValueError:
           pass
+
+      # Update the player object's internal representation of its location
+      playerFunc()
+
+      # Place the player in the new cell
+      self.cave.addEntity(self.player, self.player.x, self.player.y)
 
   def ropeToggle(self):
     if self.player.attached:
