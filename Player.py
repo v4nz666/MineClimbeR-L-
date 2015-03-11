@@ -14,6 +14,10 @@ class Player(Actor):
     self.maxTorchStrength = 25
     self.torchStrength = self.maxTorchStrength
 
+    self.pickStrength = 0
+    self.maxPickStrength = 0
+    self.basePickStrength = 100
+
     self.needFovUpdate = True
 
     self.fell = 0
@@ -22,10 +26,20 @@ class Player(Actor):
     self.maxFallHeight = 2
 
     self.attached = False
-
     self.inventory = [Anchor for i in range(self.startingAnchors)] + [Rope for i in range(self.ropeCount)]
 
+  def collectPick(self, pick):
+    self.maxPickStrength = pick.material.multiplier * self.basePickStrength
+    self.pickStrength = self.maxPickStrength
+
+  def damagePick(self):
+    self.pickStrength = max(0, self.pickStrength - 1)
+    return self.pickStrength > 0
+
   def anchorIn(self):
+    if self.falling:
+      return False
+
     hasAnchor = Anchor in self.map.getCell(self.x, self.y).entities
     if Anchor in self.inventory or hasAnchor:
       self.attached = True

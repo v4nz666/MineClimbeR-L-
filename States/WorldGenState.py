@@ -12,7 +12,7 @@ class WorldGenState(GameState):
   def __init__(self, name, manager, ui):
     super(WorldGenState, self).__init__(name, manager, ui)
     self.cave = None
-    self.caveW = self.view.width * 4 / 5
+    self.caveW = self.view.width# * 4 / 5
     self.caveH = self.view.height * 10
 
     self.cave = Cave(self.caveW, self.caveH)

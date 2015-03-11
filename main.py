@@ -4,6 +4,15 @@ from RoguePy.libtcod import libtcod
 from RoguePy.State import StateManager
 from RoguePy.UI.UI import UI
 
+# import pyglet
+# import os
+#
+# pwd = os.path.dirname(os.path.realpath(__file__))
+# pyglet.resource.path = [os.path.join(pwd,'Sounds')]
+# pyglet.resource.reindex()
+# bgm = pyglet.resource.media('3158__suonho__suonho-hypersuspance.wav', False)
+# bgm.play()
+
 FPS = 60
 UI_WIDTH = 105
 UI_HEIGHT = 60

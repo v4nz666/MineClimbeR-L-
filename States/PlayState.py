@@ -1,9 +1,9 @@
 from Player import Player
 from RoguePy.UI import Elements
 from MyElements import MyMapElement
-from Terrain import terrains
 from Item.itemTypes import Anchor
 from Item.itemTypes import Rope
+from Item.itemTypes import CopperPick
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
 
@@ -17,11 +17,15 @@ class PlayState(GameState):
     self.player = Player()
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
+    self.player.collectPick(CopperPick)
 
     self.ropePath = []
     self.dug = None
 
     self.turnTaken = False
+
+    self.torchTicks = 100
+    self.ticks = 0
 
 
   def tick(self):
@@ -30,7 +34,10 @@ class PlayState(GameState):
 
     ########
     # Non-turn-based updates
-    self.mapElement.center(self.player.x, self.player.y)
+    self.ticks += 1
+    if not self.ticks % self.torchTicks:
+      self.player.torchStrength = max(1, self.player.torchStrength - 1)
+      self.player.needFovUpdate = True
 
     if self.player.falling:
       if self.cave.getCell(self.player.x, self.player.y + 1).passable():
@@ -44,6 +51,8 @@ class PlayState(GameState):
     if self.player.needFovUpdate:
       self.player.needFovUpdate = False
       self.mapElement.calculateFovMap()
+
+    self.mapElement.center(self.player.x, self.player.y)
     self._updateUI()
     ########
 
@@ -139,18 +148,6 @@ class PlayState(GameState):
         'fn': self.toggleCrafting
       },
       })
-    self.invList.setInputs({
-      'invUp': {
-        'key': libtcod.KEY_PAGEUP,
-        'ch': None,
-        'fn': self.invList.scrollUp
-      },
-      'invDn': {
-        'key': libtcod.KEY_PAGEDOWN,
-        'ch': None,
-        'fn': self.invList.scrollDown
-      }
-    })
 
 
   def placePlayer(self):
@@ -173,51 +170,53 @@ class PlayState(GameState):
     self.mapElement = self.view.addElement(MyMapElement(0, 0, self.cave.width, self.view.height, self.cave))
 
     # Setup the right-hand pane
-    panelH = 12
-    panelW = self.view.width / 5
-    panelX =  self.view.width - panelW
+    panelX = self.view.width - 20
+    panelW = 18
+    panelH = 11
+    panelY = self.view.height - (panelH + 2)
 
-    sharedTl = libtcod.CHAR_TEEE
-    sharedTr = libtcod.CHAR_TEEW
+    self.statPanel = self.mapElement.addElement(Elements.Element(panelX, panelY, panelW, panelH))\
+      .setDefaultColors(libtcod.light_azure, libtcod.azure)
+    self.statPanel.bgOpacity = 0
+    
+    hpLabel = self.statPanel.addElement(Elements.Label(5, 0, 'HP'))
+    hpLabel.bgOpacity = 0
+    hpLabel.setDefaultForeground(libtcod.green)
 
-    self.statFrame = self.view.addElement(Elements.Frame(panelX, 0, panelW, panelH)) \
-      .setTitle('Stats').setDefaultColors(libtcod.white, libtcod.darkest_azure)
+    self.hpBar = self.statPanel.addElement(Elements.Bar(8, 0, 10))
+    self.hpBar.setMinColor(libtcod.dark_red)
+    self.hpBar.setMaxColor(libtcod.dark_green)
+    self.hpBar.setMin(0)
+    self.hpBar.setMax(self.player.maxHealth)
+    self.hpBar.setVal(self.player.health)
 
-    self.fps = self.statFrame.addElement(Elements.Label(1, 1, 'FPS:   '))
-    self.fps.setDefaultColors(libtcod.magenta)
-    self.fps.bgOpacity = 0
+    pickLabel = self.statPanel.addElement(Elements.Label(3, 2, 'Pick'))
+    pickLabel.bgOpacity = 0
+    pickLabel.setDefaultForeground(libtcod.dark_green)
+    
+    self.pickBar = self.statPanel.addElement(Elements.Bar(8, 2, 10))
+    self.pickBar.setMinColor(libtcod.dark_red)
+    self.pickBar.setMaxColor(libtcod.dark_green)
+    self.pickBar.setMin(0)
+    self.pickBar.setMax(self.player.maxPickStrength)
+    self.pickBar.setVal(self.player.pickStrength)
+    
+    
+    self.ropeLabel = self.statPanel.addElement(Elements.Label(3, 4, 'Rope'))
+    self.ropeLabel.bgOpacity = 0
+    self.ropeLabel.setDefaultForeground(libtcod.dark_green)
 
-    invY = self.statFrame.y + self.statFrame.height - 1
-    self.invFrame = self.view.addElement(Elements.Frame(panelX, invY, panelW, panelH)) \
-      .setTitle('Inv').setDefaultColors(libtcod.white, libtcod.darkest_azure)
-    self.invFrame._chars['tl'] = sharedTl
-    self.invFrame._chars['tr'] = sharedTr
-    self.invList = self.invFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 2)) \
-      .setDefaultColors(libtcod.dark_green)
-    self.invList.bgOpacity = 0
+    self.anchorLabel = self.statPanel.addElement(Elements.Label(0, 6, 'Anchors'))
+    self.anchorLabel.bgOpacity = 0
+    self.anchorLabel.setDefaultForeground(libtcod.silver)
 
-    helpY = self.invFrame.y + self.invFrame.height - 1
-    self.helpFrame = self.view.addElement(Elements.Frame(panelX, helpY, panelW, panelH)) \
-      .setTitle('Commands').setDefaultColors(libtcod.white, libtcod.darkest_azure)
-    self.helpFrame._chars['tl'] = sharedTl
-    self.helpFrame._chars['tr'] = sharedTr
+    tabLabel = self.statPanel.addElement(Elements.Label(5, 8, 'TAB Inv/Craft'))
+    tabLabel.bgOpacity = 0
+    tabLabel.setDefaultForeground(libtcod.yellow)
 
-    self.helpList = self.helpFrame.addElement(Elements.List(1, 1, panelW - 2, panelH - 3)) \
-      .setDefaultColors(libtcod.lightest_blue)
-    self.defaultHelpItems = [
-      'NP 1-9:   Move/Wait',
-      'NP 0  :     Aim Bow',
-      'Spc   : Toggle Rope',
-      'Tab   :    Crafting',
-      'PgUp/Dn: Scroll Inv'
-
-    ]
-    self.helpItem = self.helpFrame.addElement(Elements.Label(1, panelH - 2, "? - Detailed Help")) \
-      .setDefaultColors(libtcod.gold)
-    self.helpItem.bgOpacity = 0
-
-    self.helpList.setItems(self.defaultHelpItems)
-    self.helpList.bgOpacity = 0
+    helpLabel = self.statPanel.addElement(Elements.Label(12, 10, '?-Help'))
+    helpLabel.bgOpacity = 0
+    helpLabel.setDefaultForeground(libtcod.light_yellow)
 
     craftingX = self.view.width / 3
     craftingW = self.view.width / 3
@@ -381,6 +380,8 @@ class PlayState(GameState):
   ########
   # Map interactions
   def dig(self, x, y):
+    if not self.player.damagePick():
+      return False
     cell = self.cave.getCell(x, y)
 
     oldTerrain = cell.terrain
@@ -398,16 +399,35 @@ class PlayState(GameState):
   ########
   # View updates - per tick
   def _updateUI(self):
-    invDict = {}
-    for i in self.player.inventory:
-      key = i.name
-      if key not in invDict:
-        invDict[key] = 0
-      invDict[key] += 1
-    invList = map(lambda key: key + ": " + str(invDict[key]),invDict)
-    self.invList.setItems(invList)
-    self.fps.setLabel('FPS: ' + str(libtcod.sys_get_fps()))
-    self.fps.setDefaultColors(libtcod.magenta)
+    #update hp bar
+    self.hpBar.setVal(self.player.health)
+
+    # Update pick bar
+    if not self.player.pickStrength:
+      self.pickBar.hide()
+    else:
+      self.pickBar.show()
+      self.pickBar.setMax(self.player.maxPickStrength)
+      self.pickBar.setVal(self.player.pickStrength)
+      self.pickBar.calculateColors()
+
+    self.ropeLabel.setLabel("Rope " + str(self.player.inventory.count(Rope)))
+    self.ropeLabel.bgOpacity = 0
+    self.anchorLabel.setLabel("Anchors " + str(self.player.inventory.count(Anchor)))
+    self.anchorLabel.bgOpacity = 0
+    print self.player.pickStrength
+
+
+
+
+    # invDict = {}
+    # for i in self.player.inventory:
+    #   key = i.name
+    #   if key not in invDict:
+    #     invDict[key] = 0
+    #   invDict[key] += 1
+    # invList = map(lambda key: key + ": " + str(invDict[key]),invDict)
+    # self.invList.setItems(invList)
 
 
 
