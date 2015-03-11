@@ -52,7 +52,7 @@ class PlayState(GameState):
     if self.turnTaken:
       for e in self.cave.enemies:
         if self.player.distance(e.x, e.y) <= e.maxPath:
-          e.aiMove()
+          e.aiUpdate()
           if self.player.dead():
             return
         else:

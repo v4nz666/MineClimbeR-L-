@@ -15,7 +15,7 @@ class Item(Entity):
     self.collectible = True
     self.maxInv = 2
 
-    # The type of entity that we'll spawn, when first encountered
+    # The type of Enemy that we'll spawn, when first encountered
     # ...This should probably live in a Spawner derivative class.
     self.spawns = None
 

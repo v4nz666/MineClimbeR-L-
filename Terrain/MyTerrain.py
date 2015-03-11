@@ -8,6 +8,11 @@ class MyTerrain(Terrain):
     # The item we'll drop when destroyed
     self.itemDrop = None
     self.digTerrain = None
+    self.burnTerrain = None
+
+  def burns(self, terrain):
+    self.burnTerrain = terrain
+    return self
 
   def drops(self, item):
     self.itemDrop = item

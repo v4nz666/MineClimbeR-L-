@@ -80,7 +80,6 @@ Wood = Item('Wood')
 Wood.setChar('-')
 Wood.setColor(libtcod.dark_orange)
 
-
 BatDef = {
   'args': ['Bat', '^', libtcod.darkest_grey, 1, 3, 3, 10],
   'ai': BatAi,
@@ -113,55 +112,54 @@ DragonDef = {
   'range': 5
 }
 
-
 BatSpawner = Item('')
-BatSpawner.genCount = 30
-BatSpawner.genMin = 0.05
-BatSpawner.genMax = 0.75
 # BatSpawner.genCount = 30
 # BatSpawner.genMin = 0.05
 # BatSpawner.genMax = 0.75
+BatSpawner.genCount = 30
+BatSpawner.genMin = 0.05
+BatSpawner.genMax = 0.75
 BatSpawner.collectible = False
 BatSpawner.spawns = BatDef
 
 
 SpiderSpawner = Item('')
-SpiderSpawner.genCount = 15
-SpiderSpawner.genMin = 0.0
-SpiderSpawner.genMax = 0.20
 # SpiderSpawner.genCount = 15
 # SpiderSpawner.genMin = 0.0
-# SpiderSpawner.genMax = 0.60
+# SpiderSpawner.genMax = 0.20
+SpiderSpawner.genCount = 15
+SpiderSpawner.genMin = 0.0
+SpiderSpawner.genMax = 0.60
 SpiderSpawner.collectible = False
 SpiderSpawner.spawns = SpiderDef
 
 SnakeSpawner = Item('')
-SnakeSpawner.genCount = 5
-SnakeSpawner.genMin = 0.0
-SnakeSpawner.genMax = 0.2
 # SnakeSpawner.genCount = 5
 # SnakeSpawner.genMin = 0.0
-# SnakeSpawner.genMax = 0.25
+# SnakeSpawner.genMax = 0.2
+SnakeSpawner.genCount = 5
+SnakeSpawner.genMin = 0.0
+SnakeSpawner.genMax = 0.25
 SnakeSpawner.collectible = False
 SnakeSpawner.spawns = SnakeDef
 
 GoblinSpawner = Item('')
-GoblinSpawner.genCount = 15
-GoblinSpawner.genMin = 0
-GoblinSpawner.genMax = 0.2
 # GoblinSpawner.genCount = 15
-# GoblinSpawner.genMin = 0.5
-# GoblinSpawner.genMax = 0.8
+# GoblinSpawner.genMin = 0
+# GoblinSpawner.genMax = 0.2
+GoblinSpawner.genCount = 15
+GoblinSpawner.genMin = 0.5
+GoblinSpawner.genMax = 0.8
 GoblinSpawner.collectible = False
 GoblinSpawner.spawns = GoblinDef
 
 TrollSpawner = Item('')
-TrollSpawner.genCount = 10
-TrollSpawner.genMin = 0
-TrollSpawner.genMax = 0.2
 # TrollSpawner.genCount = 10
-# TrollSpawner.genMin = 0.65
-# TrollSpawner.genMax = 0.9
+# TrollSpawner.genMin = 0
+# TrollSpawner.genMax = 0.2
+TrollSpawner.genCount = 10
+TrollSpawner.genMin = 0.65
+TrollSpawner.genMax = 0.9
 TrollSpawner.collectible = False
 TrollSpawner.spawns = TrollDef
 

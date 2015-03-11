@@ -15,6 +15,6 @@ class Enemy(Actor):
   def setAi(self, ai):
     self._ai = ai
 
-  def aiMove(self):
-    self._ai.move()
-    pass
+  def aiUpdate(self):
+    if self._ai:
+      self._ai.update()
