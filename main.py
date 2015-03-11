@@ -26,6 +26,7 @@ libtcod.sys_force_fullscreen_resolution(UI_FSRES_X, UI_FSRES_Y)
 
 ui = UI()
 ui.init(UI_WIDTH, UI_HEIGHT, UI_FS)
+libtcod.console_set_window_title('MineClimbeR(L)')
 
 # TODO: enable
 #libtcod.console_credits()

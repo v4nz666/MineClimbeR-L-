@@ -19,7 +19,7 @@ class AboutState(GameState):
       .setDefaultColors(libtcod.azure, libtcod.darkest_azure)
 
     titleItems = [
-      "The Mustached Archer",
+      "MineClimbeR(L)",
       "Written by Jeff Ripley",
       "March 2015"
     ]
@@ -36,7 +36,7 @@ class AboutState(GameState):
       i += 1
 
     aboutText =\
-      "Using my as-yet unreleased libtcod framework, RoguePy.\n\n" + \
+      "Built using my as-yet unreleased libtcod framework, RoguePy.\n\n" + \
       "This is the first project I've undertaken, other than tech demos, with the RoguePy framework " + \
       "and, while it's been quite useful, and saved me lots of time, I've  come across many shortcomings, " + \
       "where I've needed to insert my own class to provide the functionality I've needed to make a worthwhile " + \
