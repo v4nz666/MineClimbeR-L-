@@ -38,13 +38,19 @@ class MyMapElement(Elements.Map):
             # This should definitely not live here, in the display layer :/
             for e in c.entities:
               if e.spawns:
-                enemy = Enemy(self.player, *e.spawns['args'])
+                enemyDef = e.spawns
+                enemy = Enemy(self.player, *enemyDef['args'])
                 print "Spawning enemy: " + str(enemy.name) + " at " + str((x, mapY))
-                enemy.setAi(e.spawns['ai'](self._map, enemy))
+
+                enemy.setAi(enemyDef['ai'](self._map, enemy))
                 enemy.setMap(self._map)
-                enemy.maxPath = e.spawns['maxPath']
-                if 'range' in e.spawns:
-                  enemy.range = e.spawns['range']
+                enemy.maxPath = enemyDef['maxPath']
+                if 'range' in enemyDef:
+                  enemy.range = enemyDef['range']
+                if 'drops' in enemyDef:
+                  enemy.drops = enemyDef['drops']
+                  enemy.dropChance = enemyDef['dropChance']
+
                 self._map.addEntity(enemy, x, mapY)
                 enemy.setCoords(x, mapY)
                 self._map.addEnemy(enemy)

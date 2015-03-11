@@ -18,6 +18,8 @@ class Actor(Item):
     self.needFovUpdate = False
 
     self.inventory = []
+    self.drops = None
+    self.dropChance = 1.0
 
   def attackActor(self, target):
     if target.dead():

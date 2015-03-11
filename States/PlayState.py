@@ -1,3 +1,4 @@
+from random import random
 from Player import Player
 from RoguePy.UI import Elements
 from MyElements import MyMapElement
@@ -202,8 +203,7 @@ class PlayState(GameState):
     self.pickBar.setMin(0)
     self.pickBar.setMax(self.player.maxPickStrength)
     self.pickBar.setVal(self.player.pickStrength)
-    
-    
+
     self.ropeLabel = self.statPanel.addElement(Elements.Label(3, 4, 'Rope'))
     self.ropeLabel.bgOpacity = 0
     self.ropeLabel.setDefaultForeground(libtcod.dark_green)
@@ -259,6 +259,10 @@ class PlayState(GameState):
           if e.x == newX and e.y == newY:
             self.player.attackActor(e)
             if e.dead():
+              if e.drops:
+                rnd = random()
+                if rnd <= e.dropChance:
+                  self.cave.addEntity(e.drops, e.x, e.y)
               self.cave.removeEnemy(e)
             return False
 

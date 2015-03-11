@@ -90,6 +90,11 @@ Water.genCount = 50
 Water.genMin = 0.05
 Water.genMax = 0.95
 
+DragonScale = Item('Dragon Scale')
+DragonScale.setChar(libtcod.CHAR_RADIO_SET)
+DragonScale.setColor(libtcod.chartreuse)
+
+
 def collectWater(player):
   player.health = min(player.maxHealth, player.health + 25)
   return True
@@ -124,33 +129,42 @@ DiamondPick.material = Diamond
 BatDef = {
   'args': ['Bat', '^', libtcod.darkest_grey, 1, 3, 3, 10],
   'ai': BatAi,
-  'maxPath': 15,
+  'maxPath': 15
 }
 SpiderDef = {
   'args': ['Spider', 'x', libtcod.darker_sepia, 3, 4, 3, 8],
   'ai': SpiderAi,
   'maxPath': 10,
+  'drops': Silk,
+  'dropChance': 0.5
 }
 SnakeDef = {
   'args': ['Snake', 's', libtcod.dark_amber, 5, 5, 3, 5],
   'ai': SnakeAi,
   'maxPath': 5,
+  'drops': Venom,
+  'dropChance': 0.5
 }
 GoblinDef = {
   'args': ['Goblin', 'g', libtcod.han, 10, 8, 6, 5],
   'ai': GoblinAi,
   'maxPath': 15,
+  'drops': Arrow,
+  'dropChance': 0.25
 }
 TrollDef = {
   'args': ['Troll', 'T', libtcod.yellow, 15, 12, 12, 2],
   'ai': TrollAi,
   'maxPath': 20,
+  'drops': Diamond,
+  'dropChance': 0.05
 }
 DragonDef = {
   'args': ['Dragon', 'D', libtcod.dark_crimson, 50, 20, 25, 10],
   'ai': DragonAi,
   'maxPath': 50,
-  'range': 5
+  'range': 5,
+  'drops': DragonScale
 }
 
 BatSpawner = Item('')
@@ -204,12 +218,12 @@ TrollSpawner.collectible = False
 TrollSpawner.spawns = TrollDef
 
 DragonSpawner = Item('')
-DragonSpawner.genCount = 1
-DragonSpawner.genMin = 0
-DragonSpawner.genMax = 0.05
 # DragonSpawner.genCount = 1
-# DragonSpawner.genMin = 0.95
-# DragonSpawner.genMax = 1.0
+# DragonSpawner.genMin = 0
+# DragonSpawner.genMax = 0.05
+DragonSpawner.genCount = 1
+DragonSpawner.genMin = 0.95
+DragonSpawner.genMax = 1.0
 DragonSpawner.collectible = False
 DragonSpawner.spawns = DragonDef
 
