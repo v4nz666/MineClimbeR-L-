@@ -29,6 +29,9 @@ class PlayState(GameState):
     self.torchTicks = 100
     self.ticks = 0
 
+    self.rangedMode = False
+    self.targetX = 0
+    self.targetY = 0
 
   def tick(self):
     if self.player.dead():
@@ -138,6 +141,11 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.toggleCrafting
       },
+      'toggleRanged': {
+        'key': libtcod.KEY_KP0,
+        'ch': None,
+        'fn': self.toggleRanged
+      },
       'quit': {
         'key': libtcod.KEY_ESCAPE,
         'ch': None,
@@ -150,7 +158,7 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.toggleCrafting
       },
-      })
+    })
 
 
   def placePlayer(self):
@@ -208,6 +216,7 @@ class PlayState(GameState):
     self.ropeLabel.bgOpacity = 0
     self.ropeLabel.setDefaultForeground(libtcod.dark_green)
 
+
     self.anchorLabel = self.statPanel.addElement(Elements.Label(0, 6, 'Anchors'))
     self.anchorLabel.bgOpacity = 0
     self.anchorLabel.setDefaultForeground(libtcod.silver)
@@ -230,6 +239,17 @@ class PlayState(GameState):
       .setTitle('Crafting') \
       .setDefaultColors(libtcod.white, libtcod.darkest_azure)
 
+    # The overlay containing our crosshair
+    self.rangedOverlay = self.mapElement.addElement(Elements.Element(0, 0, self.cave.width, self.mapElement.height))
+    # We only want to display the "+" char, and not disturb the map underneath
+    self.rangedOverlay.bgOpacity = 0
+    # Override the draw method, so we can easily draw our "+"
+    self.rangedOverlay.draw = self.drawOverlay
+
+  def drawOverlay(self):
+    con = self.rangedOverlay.console
+    onScreen = self.mapElement.onScreen(self.targetX, self.targetY)
+    libtcod.console_put_char_ex(con, onScreen[0], onScreen[1], '+', libtcod.yellow, libtcod.black)
 
   ########
   # State transitions
@@ -322,6 +342,8 @@ class PlayState(GameState):
       self.cave.addEntity(self.player, self.player.x, self.player.y)
 
   def ropeToggle(self):
+    if self.rangedMode:
+      return
     if self.player.attached:
       # Remove the ropes from the cave
       for (x, y) in self.ropePath:
@@ -339,44 +361,72 @@ class PlayState(GameState):
   ########
   # Input handlers
   def mvUp(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(0, -1, self.player.moveU)
+    if self.rangedMode:
+      self.mvTarget(0, -1)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(0, -1, self.player.moveU)
 
   def mvDn(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(0, 1, self.player.moveD)
+    if self.rangedMode:
+      self.mvTarget(0, 1)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(0, 1, self.player.moveD)
 
   def mvLft(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(-1, 0, self.player.moveL)
+    if self.rangedMode:
+      self.mvTarget(-1, 0)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(-1, 0, self.player.moveL)
 
   def mvRgt(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(1, 0, self.player.moveR)
+    if self.rangedMode:
+      self.mvTarget(1, 0)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(1, 0, self.player.moveR)
 
   def mvUpLft(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(-1, -1, self.player.moveUL)
+    if self.rangedMode:
+      self.mvTarget(-1, -1)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(-1, -1, self.player.moveUL)
 
   def mvUpRgt(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(1, -1, self.player.moveUR)
+    if self.rangedMode:
+      self.mvTarget(1, -1)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(1, -1, self.player.moveUR)
 
   def mvDnLft(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(-1, 1, self.player.moveDL)
+    if self.rangedMode:
+      self.mvTarget(-1, 1)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(-1, 1, self.player.moveDL)
 
   def mvDnRgt(self) :
-    if self.player.falling:
-      return
-    self.mvPlayer(1, 1, self.player.moveDR)
+    if self.rangedMode:
+      self.mvTarget(1, 1)
+    else:
+      if self.player.falling:
+        return
+      self.mvPlayer(1, 1, self.player.moveDR)
+
+  def mvTarget(self, x, y):
+    self.targetX = max(0, min(self.cave.width - 1, self.targetX + x))
+    self.targetY = max(0, min(self.cave.height - 1, self.targetY + y))
 
   def wait(self):
     self.turnTaken = True
@@ -386,6 +436,12 @@ class PlayState(GameState):
       self.craftingModal.show(self.view)
     else:
       self.craftingModal.hide(self.view)
+
+  def toggleRanged(self):
+    self.rangedMode = not self.rangedMode
+    if self.rangedMode:
+      self.targetX = self.player.x
+      self.targetY = self.player.y
 
   ########
   # Map interactions
@@ -423,8 +479,17 @@ class PlayState(GameState):
 
     self.ropeLabel.setLabel("Rope " + str(self.player.inventory.count(Rope)))
     self.ropeLabel.bgOpacity = 0
+    self.ropeLabel.setDefaultForeground(libtcod.dark_green)
+
     self.anchorLabel.setLabel("Anchors " + str(self.player.inventory.count(Anchor)))
     self.anchorLabel.bgOpacity = 0
+    self.anchorLabel.setDefaultForeground(libtcod.silver)
+
+    if self.rangedMode:
+      self.rangedOverlay.show()
+    else:
+      self.rangedOverlay.hide()
+
 
 
 
