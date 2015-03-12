@@ -267,6 +267,13 @@ class PlayState(GameState):
     self.cellInfoFrame.setDefaultColors(libtcod.light_azure, libtcod.darker_azure, True)
     self.cellInfoFrame.hide()
 
+    ropeIndicator = "[TIED IN]"
+    ropeX = (self.view.width - len(ropeIndicator)) / 2
+    ropeY = self.view.height - 2
+    self.ropeIndicator = self.view.addElement(Elements.Label(ropeX, ropeY, ropeIndicator))
+    self.ropeIndicator.setDefaultColors(libtcod.lightest_azure, libtcod.darker_red)
+    self.ropeIndicator.hide()
+
   def drawOverlay(self):
     con = self.rangedOverlay.console
     onScreen = self.mapElement.onScreen(self.targetX, self.targetY)
@@ -365,6 +372,7 @@ class PlayState(GameState):
   def ropeToggle(self):
     if self.rangedMode:
       return
+    self.ropeIndicator.toggleVisible()
     if self.player.attached:
       # Remove the ropes from the cave
       for (x, y) in self.ropePath:
