@@ -31,4 +31,3 @@ the depths of the old mine, and determine once and for all the truth about the r
 - Simple crafting mechanic to repair your tools, build new anchors, weapons, arrows,etc
 - Ranged / Melee combat
 - Damage / "health" multipliers for materials used during crafting - Tin, Copper, Bronze, Iron, Steel, Diamond
-
