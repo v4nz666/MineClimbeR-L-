@@ -1,4 +1,4 @@
-from helpContents import *
+from helpcontents import *
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
 

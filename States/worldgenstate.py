@@ -1,7 +1,7 @@
 from random import randrange
 
 from Terrain import terrains
-from Item import itemTypes
+from Item import itemtypes
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
 from Cave import Cave
@@ -155,18 +155,18 @@ class WorldGenState(GameState):
 
   def _genEntities(self):
     entities = {
-      itemTypes.Coal: True,
-      itemTypes.Tin: True,
-      itemTypes.Copper: True,
-      itemTypes.Iron: True,
-      itemTypes.Diamond: True,
-      itemTypes.Water: False,
-      itemTypes.BatSpawner: False,
-      itemTypes.SpiderSpawner: False,
-      itemTypes.SnakeSpawner: False,
-      itemTypes.GoblinSpawner: False,
-      itemTypes.TrollSpawner: False,
-      itemTypes.DragonSpawner: False
+      itemtypes.Coal: True,
+      itemtypes.Tin: True,
+      itemtypes.Copper: True,
+      itemtypes.Iron: True,
+      itemtypes.Diamond: True,
+      itemtypes.Water: False,
+      itemtypes.BatSpawner: False,
+      itemtypes.SpiderSpawner: False,
+      itemtypes.SnakeSpawner: False,
+      itemtypes.GoblinSpawner: False,
+      itemtypes.TrollSpawner: False,
+      itemtypes.DragonSpawner: False
     }
 
     for entity in entities:

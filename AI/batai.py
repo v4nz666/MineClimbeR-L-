@@ -1,4 +1,4 @@
-from Ai import Ai
+from ai import Ai
 
 class BatAi(Ai):
 

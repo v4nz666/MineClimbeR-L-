@@ -1,6 +1,6 @@
 from random import random
-from Item import Item
-from AI.Ai import Ai
+from Item.item import Item
+from AI.ai import Ai
 from RoguePy.libtcod import libtcod
 
 class DragonAi(Ai):

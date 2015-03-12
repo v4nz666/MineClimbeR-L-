@@ -2,8 +2,9 @@ from math import sqrt
 from RoguePy.Map.Entity import Entity
 
 class Item(Entity):
-  def __init__(self, name):
+  def __init__(self, name, material=None):
     super(Item, self).__init__(name)
+    self.material = material
 
     # number of items to generate
     self.genCount = 0

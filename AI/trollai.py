@@ -1,6 +1,6 @@
-from Ai import Ai
+from ai import Ai
 
-class SnakeAi(Ai):
+class TrollAi(Ai):
 
   def computePath(self, xFrom, yFrom, xTo, yTo, data):
     if self.map.getCell(xTo, yTo).passable():
@@ -10,5 +10,3 @@ class SnakeAi(Ai):
       except:
         pass
     return 0
-
-

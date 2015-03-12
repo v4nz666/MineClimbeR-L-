@@ -1,4 +1,4 @@
-from Item.itemTypes import Anchor
+from Item.itemtypes import Anchor
 from RoguePy.Map.Map import Map
 
 class Cave(Map):

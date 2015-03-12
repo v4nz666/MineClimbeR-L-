@@ -1,7 +1,8 @@
-from Item.Actor import Actor
-from Item.itemTypes import Anchor
-from Item.itemTypes import Rope
-from Item.itemTypes import Arrow
+from Item.actor import Actor
+from Item.itemtypes import Anchor
+from Item.itemtypes import Rope
+from Item.itemtypes import Bow
+from Item.itemtypes import Arrow
 
 class Player(Actor):
 
@@ -29,7 +30,7 @@ class Player(Actor):
     self.attached = False
     self.inventory = \
       [Anchor for i in range(self.startingAnchors)] + \
-      [Rope for i in range(self.ropeCount)]
+      [Rope for i in range(self.ropeCount)] + [Bow]
 
   def collectPick(self, pick):
     self.maxPickStrength = int(pick.material.multiplier * self.basePickStrength)

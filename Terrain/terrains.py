@@ -1,6 +1,6 @@
 from RoguePy.libtcod import libtcod
-from Terrain.MyTerrain import MyTerrain
-from Item.itemTypes import Wood
+from Terrain.myterrain import MyTerrain
+from Item.itemtypes import Wood
 
 openAir = MyTerrain(True, True, "Open Air").setColors(libtcod.white, libtcod.lighter_blue)
 openMine = MyTerrain(True, True, "Open Mine").setColors(libtcod.white, libtcod.light_grey)

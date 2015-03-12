@@ -1,2 +1,2 @@
-from MyMapElement import MyMapElement
-from HelpElement import HelpElement
+from mymapelement import MyMapElement
+from helpelement import HelpElement

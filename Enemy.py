@@ -1,4 +1,4 @@
-from Item.Actor import Actor
+from Item.actor import Actor
 
 class Enemy(Actor):
   def __init__(self, player, name, char, color, maxHealth, attack, defend, dex):

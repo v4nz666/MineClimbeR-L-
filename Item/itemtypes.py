@@ -1,14 +1,14 @@
-from Ore import Ore
-from Item import Item
+from ore import Ore
+from Item.item import Item
 from AI import *
 #from enemies import *
 from RoguePy.libtcod import libtcod
 
 Tin = Ore('Tin')
 Tin.setColor(libtcod.Color(211, 212, 213))
-Tin.genCount = 35
+Tin.genCount = 55
 Tin.genMin = 0.025
-Tin.genMax = 0.3
+Tin.genMax = 0.5
 Tin.multiplier = 0.75
 
 Copper = Ore('Copper')
@@ -27,7 +27,7 @@ Iron.multiplier = 1.5
 
 Coal = Ore('Coal')
 Coal.setColor(libtcod.black)
-Coal.genCount = 100
+Coal.genCount = 125
 Coal.genMin = 0.05
 Coal.genMax = 0.95
 
@@ -48,7 +48,7 @@ Steel = Ore('Steel')
 Steel.setColor(libtcod.Color(192, 192, 192))
 Steel.multiplier = 1.75
 
-Anchor = Item('Climbing anchor')
+Anchor = Item('Anchor')
 Anchor.setChar('"')
 Anchor.setColor(libtcod.silver)
 Anchor.collectible = False
@@ -66,7 +66,7 @@ Thread = Item('Thread')
 Thread.setChar('%')
 Thread.setColor(libtcod.lighter_crimson)
 
-Silk = Item('Spider Silk')
+Silk = Item('Silk')
 Silk.setChar('%')
 Silk.setColor(libtcod.lightest_crimson)
 
@@ -91,6 +91,8 @@ Water.genCount = 50
 Water.genMin = 0.05
 Water.genMax = 0.95
 
+Bow = Item('Bow')
+
 DragonScale = Item('Dragon Scale')
 DragonScale.setChar(libtcod.CHAR_RADIO_SET)
 DragonScale.setColor(libtcod.chartreuse)
@@ -102,38 +104,17 @@ def collectWater(player):
 Water.collect = collectWater
 ########
 # Tools
-TinPick = Item('Tin Pick')
-TinPick.material = Tin
-
-CopperPick = Item('Copper Pick')
-CopperPick.material = Copper
-
-BronzePick = Item('Bronze Pick')
-BronzePick.material = Bronze
-
-IronPick = Item('Iron Pick')
-IronPick.material = Iron
-
-SteelPick = Item('Steel Pick')
-SteelPick.material = Steel
-
-TinArrow = Item('Tin Arrow')
-TinArrow.material = Tin
-
-CopperArrow = Item('Copper Arrow')
-CopperArrow.material = Copper
-
-BronzeArrow = Item('Bronze Arrow')
-BronzeArrow.material = Bronze
-
-IronArrow = Item('Iron Arrow')
-IronArrow.material = Iron
-
-SteelArrow = Item('Steel Arrow')
-SteelArrow.material = Steel
-
-DiamondArrow = Item('Diamond Arrow')
-DiamondArrow.material = Diamond
+TinPick = Item('Pick', Tin)
+CopperPick = Item('Pick', Copper)
+BronzePick = Item('Pick', Bronze)
+IronPick = Item('Pick', Iron)
+SteelPick = Item('Pick', Steel)
+TinArrow = Item('Arrows', Tin)
+CopperArrow = Item('Arrows', Copper)
+BronzeArrow = Item('Arrows', Bronze)
+IronArrow = Item('Arrows', Iron)
+SteelArrow = Item('Arrows', Steel)
+DiamondArrow = Item('Arrows', Diamond)
 ########
 
 #########

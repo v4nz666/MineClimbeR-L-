@@ -2,11 +2,11 @@ from random import random
 from Player import Player
 from RoguePy.UI import Elements
 from MyElements import MyMapElement
-from Item.itemTypes import Anchor
-from Item.itemTypes import Rope
-from Item.itemTypes import CopperPick
-from Item.itemTypes import DiamondArrow
-from Item.itemTypes import Arrow
+from Item.itemtypes import Anchor, Bow
+from Item.itemtypes import Rope
+from Item.itemtypes import SteelPick
+from Item.itemtypes import DiamondArrow
+from Item.itemtypes import Arrow
 from Terrain.terrains import lava
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
@@ -21,7 +21,7 @@ class PlayState(GameState):
     self.player = Player()
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
-    self.player.collectPick(CopperPick)
+    self.player.collectPick(SteelPick)
     self.player.collectArrows(DiamondArrow, 20)
 
     self.ropePath = []
@@ -193,10 +193,10 @@ class PlayState(GameState):
     self.mapElement = self.view.addElement(MyMapElement(0, 0, self.cave.width, self.view.height, self.cave))
 
     # Setup the right-hand pane
-    panelX = self.view.width - 20
+    panelX = self.view.width - 19
     panelW = 18
     panelH = 11
-    panelY = self.view.height - (panelH + 2)
+    panelY = self.view.height - (panelH + 1)
 
     self.statPanel = self.mapElement.addElement(Elements.Element(panelX, panelY, panelW, panelH)) \
       .setDefaultColors(libtcod.light_azure, libtcod.azure)
@@ -372,16 +372,17 @@ class PlayState(GameState):
   def ropeToggle(self):
     if self.rangedMode:
       return
-    self.ropeIndicator.toggleVisible()
     if self.player.attached:
       # Remove the ropes from the cave
       for (x, y) in self.ropePath:
         self.cave.getCell(x, y).removeEntity(Rope)
       self.ropePath = []
       self.player.detach()
+      self.ropeIndicator.hide()
       self.player.falling = self.cave.getCell(self.player.x, self.player.y + 1).passable()
     else:
       if self.player.y > 5 and self.player.anchorIn():
+        self.ropeIndicator.show()
         self.ropePath.append((self.player.x, self.player.y))
         self.cave.addEntity(Anchor, self.player.x, self.player.y)
         self.cave.addEntity(Rope, self.player.x, self.player.y)
@@ -479,7 +480,7 @@ class PlayState(GameState):
     self.turnTaken = True
     self.rangedMode = False
 
-    if not Arrow in self.player.inventory:
+    if not (Bow in self.player.inventory and Arrow in self.player.inventory):
       return
     self.player.dropItem(Arrow)
     print self.player.inventory.count(Arrow), " arrows left"

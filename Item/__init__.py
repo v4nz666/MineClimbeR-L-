@@ -1,5 +1,5 @@
-from Item import Item
-from Actor import Actor
-from Ore import Ore
+from item import Item
+from actor import Actor
+from ore import Ore
 
-import itemTypes
+import itemtypes

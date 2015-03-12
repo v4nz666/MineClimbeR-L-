@@ -1,6 +1,6 @@
 from random import randrange
 from RoguePy.libtcod import libtcod
-from Item import Item
+from item import Item
 
 
 
