@@ -1,4 +1,4 @@
-# mustached-archer
+# MineClimbeR(L)
 
 2015 7DRL Entry  
 Jeff Ripley
@@ -21,4 +21,14 @@ the depths of the old mine, and determine once and for all the truth about the r
 
 --
 
-Started 2:00PM AST Saturday Mar 7th, 2015
+### Started 2:00PM AST Saturday Mar 7th, 2015
+
+## Gameplay
+
+- Side view, gravity-driven mine exploration
+- Turn-based combat mechanics, but torch strength diminishes in real time
+- Rock climbing mechanics - attach ropes to anchors to climb to otherwise inaccessible areas of the mine
+- Simple crafting mechanic to repair your tools, build new anchors, weapons, arrows,etc
+- Ranged / Melee combat
+- Damage / "health" multipliers for materials used during crafting - Tin, Copper, Bronze, Iron, Steel, Diamond
+
