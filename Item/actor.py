@@ -55,9 +55,6 @@ class Actor(Item):
       print self.name + " ranged hit " + target.name + " for[" + str(delta) + "]damage!"
       print target.name + " has [" + str(target.health) + "] health left"
 
-
-
-
   def pickupItem(self, item):
     self.inventory.append(item)
   def dropItem(self, item):

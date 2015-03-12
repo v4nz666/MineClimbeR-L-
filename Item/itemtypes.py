@@ -52,6 +52,8 @@ Anchor = Item('Anchor')
 Anchor.setChar('"')
 Anchor.setColor(libtcod.silver)
 Anchor.collectible = False
+Anchor.maxInv = 200
+Anchor.collectCount = 50
 
 Rope = Item('Rope')
 Rope.setChar('%')
@@ -78,6 +80,7 @@ Arrow.collectible = False
 Venom = Item('Venom')
 Venom.setChar('!')
 Venom.setColor(libtcod.light_green)
+Venom.multiplier = 2
 
 Wood = Item('Wood')
 Wood.setChar('-')
@@ -97,11 +100,9 @@ DragonScale = Item('Dragon Scale')
 DragonScale.setChar(libtcod.CHAR_RADIO_SET)
 DragonScale.setColor(libtcod.chartreuse)
 
+Torch = Item('Torch')
+Torch.maxInv = 1
 
-def collectWater(player):
-  player.health = min(player.maxHealth, player.health + 25)
-  return True
-Water.collect = collectWater
 ########
 # Tools
 TinPick = Item('Pick', Tin)
@@ -109,12 +110,13 @@ CopperPick = Item('Pick', Copper)
 BronzePick = Item('Pick', Bronze)
 IronPick = Item('Pick', Iron)
 SteelPick = Item('Pick', Steel)
-TinArrow = Item('Arrows', Tin)
-CopperArrow = Item('Arrows', Copper)
-BronzeArrow = Item('Arrows', Bronze)
-IronArrow = Item('Arrows', Iron)
-SteelArrow = Item('Arrows', Steel)
-DiamondArrow = Item('Arrows', Diamond)
+TinArrow = Item('Arrow', Tin)
+CopperArrow = Item('Arrow', Copper)
+BronzeArrow = Item('Arrow', Bronze)
+IronArrow = Item('Arrow', Iron)
+SteelArrow = Item('Arrow', Steel)
+DiamondArrow = Item('Arrow', Diamond)
+PoisonArrow = Item('!Arrow!', Venom)
 ########
 
 #########
@@ -235,3 +237,104 @@ TrollSpawner.setColor(libtcod.white)
 DragonSpawner.setChar('D')
 DragonSpawner.setColor(libtcod.white)
 # End TODO
+
+########
+# overridden collect methods
+def collectWater(player):
+  player.health = min(player.maxHealth, player.health + 25)
+  return True
+Water.collect = collectWater
+
+def collectTorch(player):
+  player.torchStrength = player.maxTorchStrength
+  return True
+Torch.collect = collectTorch
+
+# Arrows
+arrowCount = 20
+def collectTinArrow(player):
+  player.collectArrows(TinArrow, arrowCount)
+  return True
+TinArrow.collect = collectTinArrow
+def collectCopperArrow(player):
+  player.collectArrows(CopperArrow, arrowCount)
+  return True
+CopperArrow.collect = collectCopperArrow
+def collectBronzeArrow(player):
+  player.collectArrows(BronzeArrow, arrowCount)
+  return True
+BronzeArrow.collect = collectBronzeArrow
+def collectIronArrow(player):
+  player.collectArrows(IronArrow, arrowCount)
+  return True
+IronArrow.collect = collectIronArrow
+def collectSteelArrow(player):
+  player.collectArrows(SteelArrow, arrowCount)
+  return True
+SteelArrow.collect = collectSteelArrow
+def collectPoisonArrow(player):
+  player.collectArrows(PoisonArrow, 0)
+  return True
+PoisonArrow.collect = collectPoisonArrow
+def collectDiamondArrow(player):
+  player.collectArrows(DiamondArrow, arrowCount)
+  return True
+DiamondArrow.collect = collectDiamondArrow
+
+
+# Picks
+def collectTinPick(player):
+  player.collectPick(TinPick)
+  return True
+TinPick.collect = collectTinPick
+def collectCopperPick(player):
+  player.collectPick(CopperPick)
+  return True
+CopperPick.collect = collectCopperPick
+def collectBronzePick(player):
+  player.collectPick(BronzePick)
+  return True
+BronzePick.collect = collectBronzePick
+def collectIronPick(player):
+  player.collectPick(IronPick)
+  return True
+IronPick.collect = collectIronPick
+def collectSteelPick(player):
+  player.collectPick(SteelPick)
+  return True
+SteelPick.collect = collectSteelPick
+
+########
+# Craftables/recipes
+recipes = [
+  { 'item': Anchor,  'recipe': [Tin], 'fn': Anchor.collect },
+  { 'item': Anchor,  'recipe': [Copper], 'fn': Anchor.collect },
+  { 'item': Anchor,  'recipe': [Bronze], 'fn': Anchor.collect },
+  { 'item': Anchor,  'recipe': [Iron], 'fn': Anchor.collect },
+  { 'item': Anchor,  'recipe': [Steel], 'fn': Anchor.collect },
+
+  { 'item': Torch,  'recipe': [Wood, Coal], 'fn': Torch.collect },
+
+  { 'item': Bronze, 'recipe': [Copper, Tin], 'fn': Bronze.collect },
+  { 'item': Steel, 'recipe': [Iron, Coal], 'fn': Steel.collect },
+
+  { 'item': TinPick, 'recipe': [Wood, Tin], 'fn': TinPick.collect },
+  { 'item': CopperPick, 'recipe': [Wood, Copper], 'fn': CopperPick.collect },
+  { 'item': BronzePick, 'recipe': [Wood, Bronze], 'fn': BronzePick.collect },
+  { 'item': IronPick, 'recipe': [Wood, Iron], 'fn': IronPick.collect },
+  { 'item': SteelPick, 'recipe': [Wood, Steel], 'fn': Steel.collect },
+
+  { 'item': Thread, 'recipe': [Silk, Silk], 'fn': Thread.collect },
+  { 'item': String, 'recipe': [Thread, Thread], 'fn': String.collect },
+  { 'item': Bow, 'recipe': [Wood, String], 'fn': Bow.collect },
+
+  { 'item': TinArrow, 'recipe': [Wood, Tin], 'fn': TinArrow.collect, 'dontDrop': [Arrow] },
+  { 'item': CopperArrow, 'recipe': [Wood, Copper], 'fn': CopperArrow.collect, 'dontDrop': [Arrow] },
+  { 'item': BronzeArrow, 'recipe': [Wood, Bronze], 'fn': BronzeArrow.collect, 'dontDrop': [Arrow] },
+  { 'item': IronArrow, 'recipe': [Wood, Iron], 'fn': IronArrow.collect, 'dontDrop': [Arrow] },
+  { 'item': SteelArrow, 'recipe': [Wood, Steel], 'fn': SteelArrow.collect, 'dontDrop': [Arrow] },
+  { 'item': PoisonArrow, 'recipe': [Arrow, Venom], 'fn': PoisonArrow.collect, 'dontDrop': [Arrow] },
+  { 'item': DiamondArrow, 'recipe': [Wood, Diamond], 'fn': DiamondArrow.collect, 'dontDrop': [Arrow] }
+
+]
+

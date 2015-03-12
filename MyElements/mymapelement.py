@@ -1,6 +1,6 @@
 from math import sqrt
 from math import pow
-from Enemy import Enemy
+from enemy import Enemy
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
 
@@ -122,7 +122,7 @@ class MyMapElement(Elements.Map):
     for y in range(8):
       for x in range(self._map.width):
         c = self._map.getCell(x, y)
-        if y <= 5 or c.passable():
+        if y <= 6 or c.passable():
           self.seen[x][y] = True
 
   def _initFovMap(self):

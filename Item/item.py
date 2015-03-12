@@ -20,6 +20,8 @@ class Item(Entity):
     # ...This should probably live in a Spawner derivative class.
     self.spawns = None
 
+    self.collectCount = 1
+
   def distance(self, x, y):
     # return the linear distance to a point, from our point
     dx = x - self.x
@@ -29,8 +31,11 @@ class Item(Entity):
 
   def collect(self, player):
     inInv = player.inventory.count(self)
-    if inInv < self.maxInv:
-      player.pickupItem(self)
-      return True
-    return False
+    for i in range(self.collectCount):
+      if inInv < self.maxInv:
+        player.pickupItem(self)
+      else:
+        return False
+    return True
+
 

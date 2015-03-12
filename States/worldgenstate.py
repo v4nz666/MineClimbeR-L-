@@ -4,7 +4,7 @@ from Terrain import terrains
 from Item import itemtypes
 from RoguePy.UI import Elements
 from RoguePy.libtcod import libtcod
-from Cave import Cave
+from cave import Cave
 from RoguePy.State.GameState import GameState
 
 

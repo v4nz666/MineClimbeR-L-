@@ -1,12 +1,8 @@
 from random import random
-from Player import Player
+from player import Player
 from RoguePy.UI import Elements
 from MyElements import MyMapElement
-from Item.itemtypes import Anchor, Bow
-from Item.itemtypes import Rope
-from Item.itemtypes import SteelPick
-from Item.itemtypes import DiamondArrow
-from Item.itemtypes import Arrow
+from Item.itemtypes import *
 from Terrain.terrains import lava
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
@@ -22,7 +18,7 @@ class PlayState(GameState):
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
     self.player.collectPick(SteelPick)
-    self.player.collectArrows(DiamondArrow, 20)
+    self.player.collectArrows(CopperArrow, 20)
 
     self.ropePath = []
     self.dug = None
@@ -38,6 +34,8 @@ class PlayState(GameState):
     self.targetY = 0
 
     self.arrowCoord = None
+
+    self.availableCraftingRecipes = []
 
   def tick(self):
     if self.player.dead():
@@ -164,13 +162,68 @@ class PlayState(GameState):
         'fn': self.quit
       }
     })
+
+    ########
+    # Inventory/Crafting-specific inputs
     self.craftingModal.setInputs({
-      'closeModal': {
+      'closeModalTab': {
         'key': libtcod.KEY_TAB,
         'ch': None,
         'fn': self.toggleCrafting
       },
+      'closeModalEsc': {
+        'key': libtcod.KEY_ESCAPE,
+        'ch': None,
+        'fn': self.toggleCrafting
+      },
       })
+
+    self.invList.setInputs({
+      'invUp': {
+        'key': libtcod.KEY_PAGEUP,
+        'ch': None,
+        'fn': self.invList.scrollUp
+      },
+      'invDn': {
+        'key': libtcod.KEY_PAGEDOWN,
+        'ch': None,
+        'fn': self.invList.scrollDown
+      }
+    })
+    
+    self.craftingMenu.setInputs({
+      'craftUpArrow': {
+        'key': libtcod.KEY_UP,
+        'ch': None,
+        'fn': self.scrollCraftingUp
+      },
+      'craftDnArrow': {
+        'key': libtcod.KEY_DOWN,
+        'ch': None,
+        'fn': self.scrollCraftingDown
+      },
+      'craftUpKP': {
+        'key': libtcod.KEY_KP8,
+        'ch': None,
+        'fn': self.scrollCraftingUp
+      },
+      'craftDnKP': {
+        'key': libtcod.KEY_KP2,
+        'ch': None,
+        'fn': self.scrollCraftingDown
+      },
+      'craftEnterKP': {
+        'key': libtcod.KEY_KPENTER,
+        'ch': None,
+        'fn': self.craftingMenu.selectFn
+      },
+      'craftEnter': {
+        'key': libtcod.KEY_ENTER,
+        'ch': None,
+        'fn': self.craftingMenu.selectFn
+      },
+
+    })
 
 
   def placePlayer(self):
@@ -198,58 +251,116 @@ class PlayState(GameState):
     panelH = 11
     panelY = self.view.height - (panelH + 1)
 
-    self.statPanel = self.mapElement.addElement(Elements.Element(panelX, panelY, panelW, panelH)) \
+    self.statPanelRight = self.mapElement.addElement(Elements.Element(panelX, panelY, panelW, panelH)) \
       .setDefaultColors(libtcod.light_azure, libtcod.azure)
-    self.statPanel.bgOpacity = 0
+    self.statPanelRight.bgOpacity = 0
     
-    hpLabel = self.statPanel.addElement(Elements.Label(5, 0, 'HP'))
+    hpLabel = self.statPanelRight.addElement(Elements.Label(5, 0, 'HP'))
     hpLabel.bgOpacity = 0
     hpLabel.setDefaultForeground(libtcod.green)
 
-    self.hpBar = self.statPanel.addElement(Elements.Bar(8, 0, 10))
+    self.hpBar = self.statPanelRight.addElement(Elements.Bar(8, 0, 10))
     self.hpBar.setMinColor(libtcod.dark_red)
     self.hpBar.setMaxColor(libtcod.dark_green)
     self.hpBar.setMin(0)
     self.hpBar.setMax(self.player.maxHealth)
     self.hpBar.setVal(self.player.health)
 
-    pickLabel = self.statPanel.addElement(Elements.Label(3, 2, 'Pick'))
+    pickLabel = self.statPanelRight.addElement(Elements.Label(3, 2, 'Pick'))
     pickLabel.bgOpacity = 0
     pickLabel.setDefaultForeground(libtcod.dark_green)
     
-    self.pickBar = self.statPanel.addElement(Elements.Bar(8, 2, 10))
+    self.pickBar = self.statPanelRight.addElement(Elements.Bar(8, 2, 10))
     self.pickBar.setMinColor(libtcod.dark_red)
     self.pickBar.setMaxColor(libtcod.dark_green)
     self.pickBar.setMin(0)
     self.pickBar.setMax(self.player.maxPickStrength)
     self.pickBar.setVal(self.player.pickStrength)
 
-    self.ropeLabel = self.statPanel.addElement(Elements.Label(3, 4, 'Rope'))
+    self.ropeLabel = self.statPanelRight.addElement(Elements.Label(3, 4, 'Rope'))
     self.ropeLabel.bgOpacity = 0
     self.ropeLabel.setDefaultForeground(libtcod.dark_green)
 
-
-    self.anchorLabel = self.statPanel.addElement(Elements.Label(0, 6, 'Anchors'))
+    self.anchorLabel = self.statPanelRight.addElement(Elements.Label(0, 6, 'Anchors'))
     self.anchorLabel.bgOpacity = 0
     self.anchorLabel.setDefaultForeground(libtcod.silver)
 
-    tabLabel = self.statPanel.addElement(Elements.Label(5, 8, 'TAB Inv/Craft'))
+    tabLabel = self.statPanelRight.addElement(Elements.Label(5, 8, 'TAB Inv/Craft'))
     tabLabel.bgOpacity = 0
     tabLabel.setDefaultForeground(libtcod.yellow)
 
-    helpLabel = self.statPanel.addElement(Elements.Label(12, 10, '?-Help'))
+    helpLabel = self.statPanelRight.addElement(Elements.Label(12, 10, '?-Help'))
     helpLabel.bgOpacity = 0
     helpLabel.setDefaultForeground(libtcod.light_yellow)
 
-    craftingX = self.view.width / 3
-    craftingW = self.view.width / 3
-    craftingY = self.view.height / 3
-    craftingH = self.view.height / 3
+    self.statPanelLeft = self.mapElement.addElement(Elements.Element(1, self.view.height - 5, panelW, 4)) \
+      .setDefaultColors(libtcod.light_azure, libtcod.azure)
+    self.statPanelLeft.bgOpacity = 0
 
-    self.craftingModal = self.view.addElement(Elements.Modal(craftingX, craftingY, craftingW, craftingH))
-    self.craftingFrame = self.craftingModal.addElement(Elements.Frame(0, 0, craftingW, craftingH)) \
-      .setTitle('Crafting') \
-      .setDefaultColors(libtcod.white, libtcod.darkest_azure)
+    self.playerCoord = self.statPanelLeft.addElement(Elements.Label(0, 0, ""))
+    self.playerMeleeStat = self.statPanelLeft.addElement(Elements.Label(0, 2, "")).setDefaultColors(libtcod.dark_green)
+    self.playerRangedStat = self.statPanelLeft.addElement(Elements.Label(0, 3, "")).setDefaultColors(libtcod.dark_green)
+
+
+    ########
+    # Set up crafting/inventory modal elements
+    modalW = 23
+    modalH = 23
+
+    modalX = (self.view.width - modalW) / 2
+    modalY = (self.view.height -modalH) / 2
+    sharedTl = libtcod.CHAR_TEEE
+    sharedTr = libtcod.CHAR_TEEW
+
+    self.craftingModal = self.view.addElement(Elements.Modal(0, modalY, self.view.width, modalH))
+    self.craftingModal.bgOpacity = 0.7
+
+    # Inventory
+    self.invFrame = self.craftingModal.addElement(Elements.Frame(modalX, 0, modalW, 10)).setTitle('Inventory')
+    self.invList = self.invFrame.addElement(Elements.List(1, 1, modalW - 2, 8))
+    self.invList.bgOpacity = 0
+
+    # Crafting
+    self.craftFrame = self.craftingModal.addElement(Elements.Frame(modalX, 9, modalW, modalH - 9)).setTitle('Craft')
+    self.craftFrame._chars['tl'] = sharedTl
+    self.craftFrame._chars['tr'] = sharedTr
+
+    self.itemLabel = self.craftFrame.addElement(Elements.Label(2, 1, "Item"))
+    self.itemLabel.bgOpacity = 0
+    self.recipeLabel = self.craftFrame.addElement(Elements.Label(12, 1, "Recipe"))
+    self.recipeLabel.bgOpacity = 0
+
+    self.craftingMenu = self.craftFrame.addElement(Elements.Menu(1, 2, 7, 11))
+    self.craftingMenu.bgOpacity = 0.5
+    self.craftingRecipe1 = self.craftFrame.addElement(Elements.List(8, 2, 7, self.craftFrame.height - 3))
+    self.craftingRecipe1.bgOpacity = 0
+    self.craftingRecipe2 = self.craftFrame.addElement(Elements.List(15, 2, 7, self.craftFrame.height - 3))
+    self.craftingRecipe2.bgOpacity = 0
+
+    # Set colors, now that everything is in place
+    self.invFrame.setDefaultColors(libtcod.lightest_azure, libtcod.darkest_azure, True)
+    self.craftFrame.setDefaultColors(libtcod.lightest_azure, libtcod.darkest_azure, True)
+
+    # self.craftingMenu.setDefaultColors(libtcod.white)
+    self.itemLabel.setDefaultColors(libtcod.yellow)
+    self.recipeLabel.setDefaultColors(libtcod.lighter_yellow)
+
+    self.craftingRecipe1.setDefaultColors(libtcod.grey)
+    self.craftingRecipe2.setDefaultColors(libtcod.grey * 0.8)
+
+    self.invList.setDefaultColors(libtcod.dark_green)
+
+    noRoomText = "No room in inventory"
+    noRoomW = len(noRoomText)
+    noRoomX = (modalW - noRoomW) / 2
+
+    self.noRoomLabel = self.craftFrame.addElement(Elements.Label(noRoomX, 0, noRoomText))
+    self.noRoomLabel.setDefaultColors(libtcod.dark_red)
+    self.noRoomLabel.hide()
+    # end crafting
+    ########
+
+
 
     # The overlay containing our crosshair
     self.rangedOverlay = self.mapElement.addElement(Elements.Element(0, 0, self.cave.width, self.mapElement.height))
@@ -257,7 +368,7 @@ class PlayState(GameState):
     self.rangedOverlay.bgOpacity = 0
     # Override the draw method, so we can easily draw our "+"
     self.rangedOverlay.draw = self.drawOverlay
-    self.cellInfoFrame = self.view.addElement(Elements.Element(2, self.view.height - 6, 14, 4))
+    self.cellInfoFrame = self.view.addElement(Elements.Element(self.view.width - 15, self.statPanelRight.y - 4, 14, 4))
     self.cellInfoFrame.bgOpacity = 0.2
     self.cellInfoTerrain = self.cellInfoFrame.addElement(Elements.Text(0, 0, 14, 1))
     self.cellInfoTerrain.bgOpacity = 0
@@ -463,9 +574,44 @@ class PlayState(GameState):
 
   def toggleCrafting(self):
     if not self.craftingModal.visible:
+      self.noRoomLabel.hide()
       self.craftingModal.show(self.view)
     else:
       self.craftingModal.hide(self.view)
+
+  def scrollCraftingUp(self):
+    self.craftingMenu.selectUp()
+    self.craftingRecipe1._offset = self.craftingMenu._offset
+    self.craftingRecipe2._offset = self.craftingMenu._offset
+    self.noRoomLabel.hide()
+  def scrollCraftingDown(self):
+    self.craftingMenu.selectDown()
+    self.craftingRecipe1._offset = self.craftingMenu._offset
+    self.craftingRecipe2._offset = self.craftingMenu._offset
+    self.noRoomLabel.hide()
+
+  def craftItem(self, index):
+    self.noRoomLabel.hide()
+    recipe = self.availableCraftingRecipes[index]
+    inInv = self.player.inventory.count(recipe['item'])
+    if inInv >= recipe['item'].maxInv:
+      self.noRoomLabel.show()
+      return
+
+    if 'dontDrop' in recipe:
+      dontDrop = recipe['dontDrop']
+    else:
+      dontDrop = []
+    for i in recipe['recipe']:
+      if i not in dontDrop:
+        self.player.dropItem(i)
+    recipe['item'].collect(self.player)
+    self.craftingMenu._offset = 0
+    self.craftingMenu.selected = 0
+    self.craftingRecipe1._offset = 0
+    self.craftingRecipe2._offset = 0
+    self.invList._offset = 0
+
 
   def toggleRanged(self):
     self.rangedMode = not self.rangedMode
@@ -476,14 +622,12 @@ class PlayState(GameState):
   def fireBow(self):
     if not self.rangedMode:
       return
-    print "Firing!"
     self.turnTaken = True
     self.rangedMode = False
 
     if not (Bow in self.player.inventory and Arrow in self.player.inventory):
       return
     self.player.dropItem(Arrow)
-    print self.player.inventory.count(Arrow), " arrows left"
 
     self.shooting = True
     libtcod.line_init(self.player.x, self.player.y, self.targetX, self.targetY)
@@ -545,6 +689,11 @@ class PlayState(GameState):
   ########
   # View updates - per tick
   def _updateUI(self):
+
+    if self.craftingModal.visible:
+      self.updateCraftingUI()
+      return
+
     #update hp bar
     self.hpBar.setVal(self.player.health)
 
@@ -564,6 +713,15 @@ class PlayState(GameState):
     self.anchorLabel.setLabel("Anchors " + str(self.player.inventory.count(Anchor)))
     self.anchorLabel.bgOpacity = 0
     self.anchorLabel.setDefaultForeground(libtcod.silver)
+
+    self.playerCoord.setLabel(str((self.player.x, self.player.y)))
+    self.playerCoord.setDefaultColors(libtcod.silver).bgOpacity = 0
+    self.playerMeleeStat.setLabel("Melee:" + str(self.player.meleeMultiplier))
+    self.playerMeleeStat.setDefaultColors(libtcod.darker_green).bgOpacity = 0
+    self.playerRangedStat.setLabel("Range:" + str(self.player.rangeMultiplier))
+    self.playerRangedStat.setDefaultColors(libtcod.darker_green).bgOpacity = 0
+
+
 
     if self.rangedMode:
       self.rangedOverlay.show()
@@ -585,6 +743,62 @@ class PlayState(GameState):
 
     self.cellInfoTerrain.setText(cellTerrain)
 
+  def updateCraftingUI(self):
+    invDict = {}
+    for i in self.player.inventory:
+      key = i.name
+      if key not in invDict:
+        invDict[key] = 0
+      invDict[key] += 1
+    invList = [self.genInvLabel(itemName, invDict[itemName]) for itemName in invDict]
+    self.invList.setItems(invList)
+
+    craftMenuItems = []
+
+    self.availableCraftingRecipes = filter(self.filterCraftables, recipes)
+
+    list1 = []
+    list2 = []
+    i = 0
+    for recipe in self.availableCraftingRecipes:
+      craftMenuItems.append({recipe['item'].name: self.craftItem})
+      r = recipe['recipe']
+      list1.append(r[0].name)
+      if len(r) > 1:
+        list2.append(r[1].name)
+      else:
+        list2.append('n/a')
+    self.craftingMenu.setItems(craftMenuItems)
+    self.craftingMenu.height = min(self.craftingMenu.height, len(craftMenuItems))
+    self.craftingMenu.setDefaultColors(libtcod.lightest_azure, libtcod.darkest_azure)
+
+
+    self.craftingRecipe1.setItems(list1)
+    self.craftingRecipe2.setItems(list2)
+
+
+
+
+  def filterCraftables(self, recipe):
+    recipe = recipe['recipe']
+    for item in recipe:
+      recipeCount = recipe.count(item)
+      invCount = self.player.inventory.count(item)
+      if not invCount >= recipeCount:
+        return False
+    return True
+
+
+  def genInvLabel(self, str1, str2):
+    str1 = str(str1)
+    str2 = str(str2)
+    countLen = len(str2)
+    labelLen = len(str1)
+    spaces = self.invList.width - (labelLen + countLen)
+    space = ""
+    for s in range(spaces):
+      space += " "
+    return str1 + space + str2
 
 
     # invDict = {}
