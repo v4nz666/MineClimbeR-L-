@@ -13,7 +13,7 @@ class Ai(object):
     self.waitLeft = 0
 
   def doAttack(self):
-    self.enemy.attackActor(self.player)
+    self.enemy.defAttack(self.player)
     return True
 
   def update(self):

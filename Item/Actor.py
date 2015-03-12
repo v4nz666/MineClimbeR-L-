@@ -1,5 +1,9 @@
+from random import randrange
 from RoguePy.libtcod import libtcod
 from Item import Item
+
+
+
 
 class Actor(Item):
   def __init__(self, name, maxHealth, attack=0 , defend=0, dex=0):
@@ -11,6 +15,9 @@ class Actor(Item):
     self.defend = defend
     self.dex = dex
 
+    self.meleeMultiplier = 1
+    self.rangeMultiplier = 1
+
     self.map = None
     self.x = None
     self.y = None
@@ -21,18 +28,33 @@ class Actor(Item):
     self.drops = None
     self.dropChance = 1.0
 
-  def attackActor(self, target):
+  def defAttack(self, target):
     if target.dead():
       return
-    rand = libtcod.random_new()
-    damage = libtcod.random_get_int(rand, 0, self.attack)
-    defend = libtcod.random_get_int(rand, 0, target.defend)
+    atk = int(self.attack * self.meleeMultiplier)
+    damage = randrange(0, atk + 1)
+    defend = randrange(0, target.defend + 1)
 
     delta = damage - defend
     if delta > 0:
       target.health -= delta
       print self.name + " hit " + target.name + " for[" + str(delta) + "]damage!"
       print target.name + " has[" + str(target.health) + "]health left"
+  # Pits our ranged attack against an enemy's dex stat
+  def dexAttack(self, target):
+    if target.dead():
+      return
+    atk = int(self.attack * self.rangeMultiplier)
+    print "dex attack", atk
+    damage = randrange(0, atk + 1)
+    defend = randrange(0, target.dex + 1)
+
+    delta = damage - defend
+    if delta > 0:
+      target.health -= delta
+      print self.name + " ranged hit " + target.name + " for[" + str(delta) + "]damage!"
+      print target.name + " has [" + str(target.health) + "] health left"
+
 
 
 
@@ -40,8 +62,10 @@ class Actor(Item):
     self.inventory.append(item)
   def dropItem(self, item):
     if not item in self.inventory:
+      print "don't got one"
       return False
     else:
+      print "removing ", item.name
       self.inventory.remove(item)
       return True
 
@@ -58,7 +82,6 @@ class Actor(Item):
   def moveU(self):
     self.y -= 1
     self.needFovUpdate = True
-
   def moveD(self):
     self.y += 1
     self.needFovUpdate = True

@@ -5,6 +5,8 @@ from MyElements import MyMapElement
 from Item.itemTypes import Anchor
 from Item.itemTypes import Rope
 from Item.itemTypes import CopperPick
+from Item.itemTypes import DiamondArrow
+from Item.itemTypes import Arrow
 from Terrain.terrains import lava
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
@@ -20,6 +22,7 @@ class PlayState(GameState):
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
     self.player.collectPick(CopperPick)
+    self.player.collectArrows(DiamondArrow, 20)
 
     self.ropePath = []
     self.dug = None
@@ -30,18 +33,22 @@ class PlayState(GameState):
     self.ticks = 0
 
     self.rangedMode = False
+    self.shooting = False
     self.targetX = 0
     self.targetY = 0
+
+    self.arrowCoord = None
 
   def tick(self):
     if self.player.dead():
       self.doDeathState()
-
+    if self.shooting:
+      self.updateArrowPath()
     ########
     # Non-turn-based updates
     self.ticks += 1
     if not self.ticks % self.torchTicks:
-      self.player.torchStrength = max(1, self.player.torchStrength - 1)
+      self.player.torchStrength = max(2, self.player.torchStrength - 1)
       self.player.needFovUpdate = True
 
     if self.player.falling:
@@ -145,6 +152,11 @@ class PlayState(GameState):
         'key': libtcod.KEY_KP0,
         'ch': None,
         'fn': self.toggleRanged
+      },
+      'fireBow': {
+        'key': libtcod.KEY_KPENTER,
+        'ch': None,
+        'fn': self.fireBow
       },
       'quit': {
         'key': libtcod.KEY_ESCAPE,
@@ -277,7 +289,7 @@ class PlayState(GameState):
       if turnTaken:
         for e in self.cave.enemies:
           if e.x == newX and e.y == newY:
-            self.player.attackActor(e)
+            self.player.defAttack(e)
             if e.dead():
               if e.drops:
                 rnd = random()
@@ -443,6 +455,56 @@ class PlayState(GameState):
       self.targetX = self.player.x
       self.targetY = self.player.y
 
+  def fireBow(self):
+    if not self.rangedMode:
+      return
+    print "Firing!"
+    self.turnTaken = True
+    self.rangedMode = False
+
+    if not Arrow in self.player.inventory:
+      return
+    self.player.dropItem(Arrow)
+    print self.player.inventory.count(Arrow), " arrows left"
+
+    self.shooting = True
+    libtcod.line_init(self.player.x, self.player.y, self.targetX, self.targetY)
+
+
+  def updateArrowPath(self):
+    if self.arrowCoord:
+      (x, y) = self.arrowCoord
+      cell = self.cave.getCell(x,y)
+      if Arrow in cell.entities:
+        cell.removeEntity(Arrow)
+
+    (newX, newY) = libtcod.line_step()
+    if newX is None:
+      self.shooting = False
+      return
+
+    cell = self.cave.getCell(newX, newY)
+    # Stop if we hit something
+    if not(cell.passable()):
+      self.shooting = False
+
+    self.cave.addEntity(Arrow, newX, newY)
+    self.arrowCoord = (newX, newY)
+
+
+    for e in self.cave.enemies:
+      if e.x == newX and e.y == newY:
+        self.player.dexAttack(e)
+        if e.dead():
+          if e.drops:
+            rnd = random()
+            if rnd <= e.dropChance:
+              self.cave.addEntity(e.drops, e.x, e.y)
+          self.cave.removeEnemy(e)
+        return True
+
+
+
   ########
   # Map interactions
   def dig(self, x, y):
@@ -479,7 +541,7 @@ class PlayState(GameState):
 
     self.ropeLabel.setLabel("Rope " + str(self.player.inventory.count(Rope)))
     self.ropeLabel.bgOpacity = 0
-    self.ropeLabel.setDefaultForeground(libtcod.dark_green)
+    self.ropeLabel.setDefaultForeground(libtcod.lighter_crimson)
 
     self.anchorLabel.setLabel("Anchors " + str(self.player.inventory.count(Anchor)))
     self.anchorLabel.bgOpacity = 0

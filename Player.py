@@ -1,6 +1,7 @@
 from Item.Actor import Actor
 from Item.itemTypes import Anchor
 from Item.itemTypes import Rope
+from Item.itemTypes import Arrow
 
 class Player(Actor):
 
@@ -26,11 +27,18 @@ class Player(Actor):
     self.maxFallHeight = 2
 
     self.attached = False
-    self.inventory = [Anchor for i in range(self.startingAnchors)] + [Rope for i in range(self.ropeCount)]
+    self.inventory = \
+      [Anchor for i in range(self.startingAnchors)] + \
+      [Rope for i in range(self.ropeCount)]
 
   def collectPick(self, pick):
     self.maxPickStrength = int(pick.material.multiplier * self.basePickStrength)
+    self.meleeMultiplier = pick.material.multiplier
     self.pickStrength = self.maxPickStrength
+
+  def collectArrows(self, arrow, num):
+    self.rangeMultiplier = arrow.material.multiplier
+    self.inventory += [Arrow for i in range(num)]
 
   def damagePick(self):
     self.pickStrength = max(0, self.pickStrength - 1)
@@ -50,6 +58,7 @@ class Player(Actor):
       return True
     else:
       return False
+
 
   def detach(self):
     self.inventory += [Rope for i in range(self.ropeCount - self.inventory.count(Rope))]

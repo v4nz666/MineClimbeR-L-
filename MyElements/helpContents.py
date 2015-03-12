@@ -3,32 +3,32 @@ generalText = \
   "feat. There will be many monsters along the way.  " + \
   "That being said, gravity may be your biggest enemy.\n\n" + \
   "Win the game by traveling to the bottom of the " + \
-  "mine, and returning to the surface with the " + \
-  "treasure.\n\n" + \
-  "Your rope, torch, and pick will be your trusty " + \
-  "friends.\n\n" + \
+  "mine, and returning to the surface with something " + \
+  "to set the story straight.\n\n" + \
+  "Your rope and anchors will get you places you could " + \
+  "not otherwise reach.\n\n" + \
   "Dig unpassable terrain by walking into it twice in" + \
   " a row. This will wear your pick down slightly.\n\n" + \
   "Pick up many items by walking over them. Not all " + \
   "items may be picked up. Some must be crafted."
 basicsText = \
-  "                         ----------------------    " + \
-  "                         |      |      |      |    " + \
-  "  PGUP/DN                |UPLFT |  UP  | UPRGT|    " + \
-  " SCROLL INVENTORY        |      |      |      |    " + \
-  "                         ----------------------    " + \
-  "                         |      |      |      | N  " + \
-  "  TAB                    |LEFT  | WAIT | RIGHT| U  " + \
-  " TOGGLE CRAFTING MENU    |      |      |      | M  " + \
-  "                         ---------------------- P  " + \
-  "                         |      |      |      | A  " + \
-  "  SPACE                  |DNLFT | DOWN | DNRGT| D  " + \
-  " TOGGLE CLIMBING ROPE    |      |      |      |    " + \
-  "   ^                     ----------------------    " + \
-  "   |                     |             |           " + \
-  " (this is important!)    | RANGED  ATK |           " + \
-  "                         |             |           " + \
-  "                         ---------------           "
+  "                     ----------------------        " + \
+  "                     |      |      |      |        " + \
+  "                     |UPLFT |  UP  | UPRGT|        " + \
+  "                     |    7 |  8   | 9    |        " + \
+  "                     ----------------------        " + \
+  "                     |      |      |      |        " + \
+  "  TAB                |LEFT  | WAIT | RIGHT|        " + \
+  " Crafting/Inv        |    4 |  5   | 6    |        " + \
+  "                     ----------------------------- " + \
+  "                     |      |      |      |    F | " + \
+  "  SPACE              |DNLFT | DOWN | DNRGT|    I | " + \
+  " Toggle Climbing     |    1 |  2   | 3    | e  R | " + \
+  "   ^                 ---------------------- n  E | " + \
+  "   |                 |             |      | t  B | " + \
+  " this is important!  |   AIM BOW   |      | e  O | " + \
+  "                     |          0  |      | r  W | " + \
+  "                     ---------------      -------- "
 
 climbingText = \
   "\nClimb around the mine by pressing the space bar. " + \

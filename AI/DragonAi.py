@@ -65,7 +65,7 @@ class DragonAi(Ai):
               self.map.addEntity(self.fire, _x, _y)
       (x, y) = libtcod.line_step()
 
-    self.enemy.attackActor(self.player)
+    self.enemy.defAttack(self.player)
     return True
 
   def computePath(self, xFrom, yFrom, xTo, yTo, data):

@@ -23,7 +23,7 @@ Iron.setColor(libtcod.Color(102, 102, 102))
 Iron.genCount = 25
 Iron.genMin = 0.4
 Iron.genMax = 1.0
-Iron.multiplier = 1.75
+Iron.multiplier = 1.5
 
 Coal = Ore('Coal')
 Coal.setColor(libtcod.darker_grey)
@@ -46,7 +46,7 @@ Bronze.multiplier = 1.25
 
 Steel = Ore('Steel')
 Steel.setColor(libtcod.Color(192, 192, 192))
-Steel.multiplier = 2.5
+Steel.multiplier = 1.75
 
 Anchor = Item('Climbing anchor')
 Anchor.setChar('"')
@@ -71,8 +71,9 @@ Silk.setChar('%')
 Silk.setColor(libtcod.lightest_crimson)
 
 Arrow = Item('Arrow')
-Arrow.setChar('/')
+Arrow.setChar('.')
 Arrow.setColor(libtcod.lightest_grey)
+Arrow.collectible = False
 
 Venom = Item('Venom')
 Venom.setChar('!')
@@ -116,13 +117,24 @@ IronPick.material = Iron
 SteelPick = Item('Steel Pick')
 SteelPick.material = Steel
 
-DiamondPick = Item('Diamond Pick')
-DiamondPick.material = Diamond
+TinArrow = Item('Tin Arrow')
+TinArrow.material = Tin
+
+CopperArrow = Item('Copper Arrow')
+CopperArrow.material = Copper
+
+BronzeArrow = Item('Bronze Arrow')
+BronzeArrow.material = Bronze
+
+IronArrow = Item('Iron Arrow')
+IronArrow.material = Iron
+
+SteelArrow = Item('Steel Arrow')
+SteelArrow.material = Steel
+
+DiamondArrow = Item('Diamond Arrow')
+DiamondArrow.material = Diamond
 ########
-
-
-
-
 
 #########
 # Enemies
@@ -160,11 +172,12 @@ TrollDef = {
   'dropChance': 0.05
 }
 DragonDef = {
-  'args': ['Dragon', 'D', libtcod.dark_crimson, 50, 20, 25, 10],
+  'args': ['Dragon', 'D', libtcod.dark_chartreuse, 50, 20, 25, 10],
   'ai': DragonAi,
   'maxPath': 50,
   'range': 5,
-  'drops': DragonScale
+  'drops': DragonScale,
+  'dropChance': 1.0
 }
 
 BatSpawner = Item('')
@@ -218,12 +231,12 @@ TrollSpawner.collectible = False
 TrollSpawner.spawns = TrollDef
 
 DragonSpawner = Item('')
-# DragonSpawner.genCount = 1
-# DragonSpawner.genMin = 0
-# DragonSpawner.genMax = 0.05
 DragonSpawner.genCount = 1
-DragonSpawner.genMin = 0.95
-DragonSpawner.genMax = 1.0
+DragonSpawner.genMin = 0
+DragonSpawner.genMax = 0.05
+# DragonSpawner.genCount = 1
+# DragonSpawner.genMin = 0.95
+# DragonSpawner.genMax = 1.0
 DragonSpawner.collectible = False
 DragonSpawner.spawns = DragonDef
 
