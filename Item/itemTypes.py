@@ -6,28 +6,28 @@ from RoguePy.libtcod import libtcod
 
 Tin = Ore('Tin')
 Tin.setColor(libtcod.Color(211, 212, 213))
-Tin.genCount = 15
+Tin.genCount = 35
 Tin.genMin = 0.025
 Tin.genMax = 0.3
 Tin.multiplier = 0.75
 
 Copper = Ore('Copper')
 Copper.setColor(libtcod.Color(184, 115, 51))
-Copper.genCount = 20
+Copper.genCount = 40
 Copper.genMin = 0.2
 Copper.genMax = 0.5
 Copper.multiplier = 1.0
 
 Iron = Ore('Iron')
 Iron.setColor(libtcod.Color(102, 102, 102))
-Iron.genCount = 25
+Iron.genCount = 45
 Iron.genMin = 0.4
 Iron.genMax = 1.0
 Iron.multiplier = 1.5
 
 Coal = Ore('Coal')
-Coal.setColor(libtcod.darker_grey)
-Coal.genCount = 50
+Coal.setColor(libtcod.black)
+Coal.genCount = 100
 Coal.genMin = 0.05
 Coal.genMax = 0.95
 

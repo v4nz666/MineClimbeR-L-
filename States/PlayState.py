@@ -170,7 +170,7 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.toggleCrafting
       },
-    })
+      })
 
 
   def placePlayer(self):
@@ -198,7 +198,7 @@ class PlayState(GameState):
     panelH = 11
     panelY = self.view.height - (panelH + 2)
 
-    self.statPanel = self.mapElement.addElement(Elements.Element(panelX, panelY, panelW, panelH))\
+    self.statPanel = self.mapElement.addElement(Elements.Element(panelX, panelY, panelW, panelH)) \
       .setDefaultColors(libtcod.light_azure, libtcod.azure)
     self.statPanel.bgOpacity = 0
     
@@ -257,6 +257,15 @@ class PlayState(GameState):
     self.rangedOverlay.bgOpacity = 0
     # Override the draw method, so we can easily draw our "+"
     self.rangedOverlay.draw = self.drawOverlay
+    self.cellInfoFrame = self.view.addElement(Elements.Element(2, self.view.height - 6, 14, 4))
+    self.cellInfoFrame.bgOpacity = 0.2
+    self.cellInfoTerrain = self.cellInfoFrame.addElement(Elements.Text(0, 0, 14, 1))
+    self.cellInfoTerrain.bgOpacity = 0
+    self.cellInfoEntities = self.cellInfoFrame.addElement(Elements.List(0, 1, 14, 3))
+    self.cellInfoEntities.bgOpacity = 0
+
+    self.cellInfoFrame.setDefaultColors(libtcod.light_azure, libtcod.darker_azure, True)
+    self.cellInfoFrame.hide()
 
   def drawOverlay(self):
     con = self.rangedOverlay.console
@@ -549,10 +558,23 @@ class PlayState(GameState):
 
     if self.rangedMode:
       self.rangedOverlay.show()
+      self.cellInfoFrame.show()
+      self.cellInfoUpdate()
     else:
       self.rangedOverlay.hide()
+      self.cellInfoFrame.hide()
 
+  def cellInfoUpdate(self):
+    cellTerrain = "???"
+    entities = []
+    if self.mapElement.explored(self.targetX, self.targetY):
+      cell = self.cave.getCell(self.targetX, self.targetY)
+      cellTerrain = cell.terrain.desc
+      for e in cell.entities:
+        entities.append(e.name)
+      self.cellInfoEntities.setItems(entities)
 
+    self.cellInfoTerrain.setText(cellTerrain)
 
 
 

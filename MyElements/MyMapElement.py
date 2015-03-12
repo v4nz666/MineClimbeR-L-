@@ -122,7 +122,7 @@ class MyMapElement(Elements.Map):
     for y in range(8):
       for x in range(self._map.width):
         c = self._map.getCell(x, y)
-        if c.passable():
+        if y <= 5 or c.passable():
           self.seen[x][y] = True
 
   def _initFovMap(self):
@@ -135,3 +135,6 @@ class MyMapElement(Elements.Map):
   def calculateFovMap(self):
     libtcod.map_compute_fov(
         self._map._map, self.player.x, self.player.y, self.player.torchStrength, True, libtcod.FOV_SHADOW)
+
+  def explored(self, x, y):
+    return self.seen[x][y]
