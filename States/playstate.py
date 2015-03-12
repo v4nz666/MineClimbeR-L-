@@ -159,6 +159,19 @@ class PlayState(GameState):
       'quit': {
         'key': libtcod.KEY_ESCAPE,
         'ch': None,
+        'fn': self.quitToggle
+      }
+    })
+
+    self.quitConfirm.setInputs({
+      'quitBack': {
+        'key': libtcod.KEY_ESCAPE,
+        'ch': None,
+        'fn': self.quitToggle
+      },
+      'quit': {
+        'key': libtcod.KEY_ENTER,
+        'ch': None,
         'fn': self.quit
       }
     })
@@ -385,6 +398,27 @@ class PlayState(GameState):
     self.ropeIndicator.setDefaultColors(libtcod.lightest_azure, libtcod.darker_red)
     self.ropeIndicator.hide()
 
+
+    quitStr =  "Those rumours won't prove themselves..."
+    quitCmds = " <ESC> Back               <Enter> Quit "
+    quitW = len(quitStr) + 2
+    quitX = (self.view.width - quitW) / 2
+    quitH = 3
+    quitY = (self.view.height - quitH) / 2
+
+    really = "Really Quit?"
+    reallyW = len(really)
+    reallyX = (quitW - reallyW) / 2
+    reallyY = 0
+
+    self.quitConfirm = self.view.addElement(Elements.Modal(quitX, quitY, quitW, quitH))
+    quitFrame = self.quitConfirm.addElement(Elements.Frame(0, 0, quitW, quitH)).setDefaultColors(libtcod.dark_red)
+    quitFrame.addElement(Elements.Label(reallyX, reallyY, really)).setDefaultColors(libtcod.light_red)
+    quitText = quitFrame.addElement(Elements.Label(1, 1, quitStr))
+    escEnter = quitFrame.addElement(Elements.Label(1, 2, quitCmds))
+    escEnter.setDefaultColors(libtcod.light_red)
+    escEnter.bgOpacity = 0
+
   def drawOverlay(self):
     con = self.rangedOverlay.console
     onScreen = self.mapElement.onScreen(self.targetX, self.targetY)
@@ -394,6 +428,12 @@ class PlayState(GameState):
   # State transitions
   def doDeathState(self):
     self._manager.setNextState('Death')
+
+  def quitToggle(self):
+    if self.quitConfirm.visible:
+      self.quitConfirm.hide(self.view)
+    else:
+      self.quitConfirm.show(self.view)
 
   def quit(self):
     menuState = self._manager.getState('Menu')
