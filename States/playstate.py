@@ -702,6 +702,7 @@ class PlayState(GameState):
     self.player.dropItem(Arrow)
 
     self.shooting = True
+    print "initing line", self.player.x, self.player.y, self.targetX, self.targetY
     libtcod.line_init(self.player.x, self.player.y, self.targetX, self.targetY)
 
 

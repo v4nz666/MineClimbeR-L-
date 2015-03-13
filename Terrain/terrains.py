@@ -42,21 +42,25 @@ dugWoodPost = MyTerrain(True, False, "Wooden Post")\
   .setColors(libtcod.dark_orange, libtcod.light_grey)\
   .setChar(libtcod.CHAR_VLINE)\
   .digs(openMine)\
-  .drops(Wood)
+  .drops(Wood)\
+  .burns(caveBurningWood)
 caveWoodPost = MyTerrain(True, False, "Wooden Post")\
   .setColors(libtcod.dark_orange, libtcod.light_grey)\
   .setChar(libtcod.CHAR_DVLINE)\
-  .digs(dugWoodPost)
+  .digs(dugWoodPost)\
+  .burns(caveBurningWood)
 
 dugWoodBeam = MyTerrain(True, False, "Wooden Beam")\
   .setColors(libtcod.dark_orange, libtcod.light_grey)\
   .setChar(libtcod.CHAR_HLINE)\
   .digs(openMine)\
-  .drops(Wood)
+  .drops(Wood)\
+  .burns(caveBurningWood)
 caveWoodBeam = MyTerrain(True, False, "Wooden Beam")\
   .setColors(libtcod.dark_orange, libtcod.light_grey)\
   .setChar(libtcod.CHAR_DHLINE)\
-  .digs(dugWoodBeam)
+  .digs(dugWoodBeam)\
+  .burns(caveBurningWood)
 
 dugCaveWall = MyTerrain(False, False, "Rock Wall")\
   .setColors(libtcod.darkest_grey, libtcod.darker_grey)\
