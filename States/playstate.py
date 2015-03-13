@@ -14,6 +14,7 @@ class PlayState(GameState):
     super(PlayState, self).__init__(name, manager, ui)
     self.torchTicks = 100
     self.msgTtl = 100.0
+    self.dialogTicks = 0
 
     self.cave = None
 
@@ -34,6 +35,7 @@ class PlayState(GameState):
     self.ropePath = []
 
     self.turnTaken = False
+    self.dialogActive = False
 
     self.ticks = 0
 
@@ -47,6 +49,24 @@ class PlayState(GameState):
     self.availableCraftingRecipes = []
 
     self.messages = []
+
+    self.dialogMessages = {
+      7: "I should be ok, if I'm careful.",
+      10: "This shouldn't be so bad.",
+      25: "I hope this torch lasts...",
+      50: "I wish I had my bow...",
+      100: "I should have brought some water...",
+      175: "Monsters? What monsters?",
+      200: "It's just bats and spiders in here...",
+      290: "It's getting really dark...",
+      295: "What are those letters carved into the wall?",
+      300: "Doesn't look like any writing I've seen...",
+      400: "Where did these creatures come from?",
+      500: "Maybe they did set off the explosions...",
+      575: "It's getting really warm in here.",
+      580: "What was that rumbling sound?",
+      590: "No one will believe me!"
+    }
 
   def reset(self):
     self.view.clear()
@@ -62,6 +82,7 @@ class PlayState(GameState):
     self.ropePath = []
 
     self.turnTaken = False
+    self.dialogActive = False
 
     self.ticks = 0
 
@@ -103,6 +124,10 @@ class PlayState(GameState):
 
     self.mapElement.center(self.player.x, self.player.y)
     self._updateUI()
+
+    if self.dialogActive:
+      self.updateDialogMessage()
+
     ########
 
     ########
@@ -454,15 +479,18 @@ class PlayState(GameState):
     self.noRoomLabel = self.craftFrame.addElement(Elements.Label(noRoomX, 0, noRoomText))
     self.noRoomLabel.setDefaultColors(libtcod.dark_red)
     self.noRoomLabel.hide()
-    # end crafting
     ########
-
+    # Help dialog
     self.helpElement = HelpElement(self.view)
     self.helpModal = Elements.Modal(0, 0, self.view.width, self.view.height)
 
     self.view.addElement(self.helpModal)
     self.helpModal.addElement(self.helpElement)
-
+    ########
+    # Internal dialog messages
+    self.dialogLabel = self.view.addElement(Elements.Label(0, 0, ""))
+    self.dialogLabel.bgOpacity = 0
+    self.dialogLabel.hide()
     ########
     # Ranged mode
 
@@ -675,6 +703,48 @@ class PlayState(GameState):
 
       # Place the player in the new cell
       self.cave.addEntity(self.player, self.player.x, self.player.y)
+
+      if self.player.y in self.dialogMessages:
+        self.triggerDialog()
+
+
+  def triggerDialog(self):
+    if not self.dialogActive:
+      self.showDialog()
+    else:
+      print "queueing dialog message"
+    del self.dialogMessages[self.player.y]
+
+  def showDialog(self):
+    self.dialogActive = True
+    self.dialogTicks = self.msgTtl
+
+    msg = self.dialogMessages[self.player.y]
+    (x, y) = self.findDialogCoords(msg)
+    self.dialogLabel.x = x
+    self.dialogLabel.y = y
+    self.dialogLabel.setLabel(msg)
+    self.dialogLabel.show()
+    print "Showing dialog at ", (x, y)
+
+  def updateDialogMessage(self):
+    self.dialogTicks -= 1
+    o = self.dialogTicks / self.msgTtl
+    if o > 0:
+      self.dialogLabel.fgOpacity = o
+    else:
+      self.dialogLabel.hide()
+      self.dialogActive = False
+
+
+  def findDialogCoords(self, msg):
+    x = max(0, min(self.player.x - 8, self.view.width - len(msg)))
+    y =  self.player.y + 3
+
+    (x, y) = self.mapElement.onScreen(x, y)
+    if y > self.view.height - 1:
+      y = self.player.y - 3
+    return x, y
 
   def ropeToggle(self):
     if self.rangedMode:
