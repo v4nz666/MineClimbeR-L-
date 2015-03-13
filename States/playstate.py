@@ -2,6 +2,7 @@ from random import random
 from player import Player
 from RoguePy.UI import Elements
 from MyElements import MyMapElement
+from MyElements import HelpElement
 from Item.itemtypes import *
 from Terrain.terrains import lava
 from RoguePy.libtcod import libtcod
@@ -156,11 +157,33 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.fireBow
       },
+      'toggleHelp': {
+        'key': None,
+        'ch': '?',
+        'fn': self.helpToggle
+      },
       'quit': {
         'key': libtcod.KEY_ESCAPE,
         'ch': None,
         'fn': self.quitToggle
       }
+    })
+    self.helpModal.setInputs({
+      'helpBackEsc': {
+        'key': libtcod.KEY_ESCAPE,
+        'ch': None,
+        'fn': self.helpToggle
+      },
+      'helpBackQ': {
+        'key': None,
+        'ch': '?',
+        'fn': self.helpToggle
+      },
+      'helpTabs': {
+        'key': libtcod.KEY_TAB,
+        'ch': None,
+        'fn': self.helpElement.cycleTabs
+      },
     })
 
     self.quitConfirm.setInputs({
@@ -375,6 +398,13 @@ class PlayState(GameState):
     # end crafting
     ########
 
+
+
+    self.helpElement = HelpElement(self.view)
+    self.helpModal = Elements.Modal(0, 0, self.view.width, self.view.height)
+
+    self.view.addElement(self.helpModal)
+    self.helpModal.addElement(self.helpElement)
 
 
     # The overlay containing our crosshair
@@ -707,7 +737,11 @@ class PlayState(GameState):
           self.cave.removeEnemy(e)
         return True
 
-
+  def helpToggle(self):
+    if not self.helpModal.visible:
+      self.helpModal.show(self.view)
+    else:
+      self.helpModal.hide(self.view)
 
   ########
   # Map interactions
@@ -803,7 +837,6 @@ class PlayState(GameState):
     list2 = []
     i = 0
     for recipe in self.availableCraftingRecipes:
-      print "Adding recipe", recipe['item'].name
       menuItem = {recipe['item'].name: self.craftItem}
       craftMenuItems.append(menuItem)
       r = recipe['recipe']
@@ -812,8 +845,6 @@ class PlayState(GameState):
         list2.append(r[1].name)
       else:
         list2.append('n/a')
-    print len(craftMenuItems), "Craftable items"
-    print craftMenuItems
     self.craftingMenu.setItems(craftMenuItems)
 
     if len(craftMenuItems) > self.craftingMenu.height:
