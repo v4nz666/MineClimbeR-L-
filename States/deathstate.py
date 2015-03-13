@@ -20,6 +20,11 @@ class DeathState(GameState):
       self._setupInputs()
       self.pressKey.show()
 
+  def reset(self):
+    self.shown = False
+    self.slept = False
+    self.pressKey.hide()
+
   def _setupView(self):
     title = "You have died"
     titleX = (self.view.width - len(title)) / 2

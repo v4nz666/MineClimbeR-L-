@@ -14,21 +14,24 @@ class MyMapElement(Elements.Map):
     self._setupFog()
     self._initFovMap()
     self.player = None
+    self.baseOpacity = 0
+    self.fogOpacity = 0
 
   def setPlayer(self, player):
     self.player = player
 
   def draw(self):
-    baseOpacity = (1.0*self.player.y) / self._map.height
-    fogOpacity = min(1, 0.5 + (baseOpacity * 0.5))
+    self.baseOpacity = (1.0*self.player.y) / self._map.height
+    self.fogOpacity = min(1, 0.5 + (self.baseOpacity * 0.5))
     for onScreenY in range(self.height):
       mapY = onScreenY + self._offsetY
       for x in range(self.width):
         c = self._map.getCell(x, mapY)
         inTorch = libtcod.map_is_in_fov(self._map._map, x, mapY)
 
-        libtcod.console_put_char_ex(self.console, x, onScreenY, c.terrain.char, c.terrain.fg, c.terrain.bg)
-        self.renderFovOverlay(c, x, mapY, fogOpacity, inTorch)
+        if self.seen[x][mapY]:
+          libtcod.console_put_char_ex(self.console, x, onScreenY, c.terrain.char, c.terrain.fg, c.terrain.bg)
+        self.renderFovOverlay(c, x, mapY, inTorch)
 
         if inTorch:
           self.seen[x][mapY] = True
@@ -66,11 +69,7 @@ class MyMapElement(Elements.Map):
               item = c.entities[-1]
             libtcod.console_put_char_ex(self.console, x, onScreenY, item.char, item.color, c.terrain.bg)
 
-
-
-
-
-  def renderFovOverlay(self, cell, x, y, opacity, inTorch):
+  def renderFovOverlay(self, cell, x, y, inTorch):
     """
     Render the torch, and fog of war overlay for cell
 
@@ -79,29 +78,27 @@ class MyMapElement(Elements.Map):
     :param opacity: opacity to render the fog at
     :return: None
     """
+    # No overlay above ground.
     if y <= 5:
-      opacity = 0
-      bgColor = cell.terrain.bg
-    elif inTorch:
+      return
+
+    # Inside our torch light, we'll have a halo with increasing opacity
+    if inTorch:
       bgColor = self.torchColor
       opacity = self.calculateIntensity(x, y)
-    # Below ground, outside torch light, we'll render the fog of war
+      ch = cell.terrain.char
+    # Below ground, outside torch light, we'll render the fog of war for any tiles we've seen
     else:
+      # Straight black for tiles we haven't seen, no need to draw anything
       if not self.seen[x][y]:
-        bgColor = libtcod.black
-        opacity = 1
+        return
       else:
         bgColor = cell.terrain.bg
+        opacity = self.fogOpacity
+        ch = ' '
 
-    if inTorch or y <= 5:
-      terrainChar = cell.terrain.char
-    else:
-      terrainChar = ' '
-
-    libtcod.console_put_char(self.console, x, y - self._offsetY, terrainChar, libtcod.BKGND_ALPHA(opacity))
+    libtcod.console_put_char(self.console, x, y - self._offsetY, ch, libtcod.BKGND_ALPHA(opacity))
     libtcod.console_set_char_foreground(self.console, x, y - self._offsetY, cell.terrain.fg)
-
-
     if inTorch:
       libtcod.console_set_char_background(self.console, x, y - self._offsetY, bgColor, libtcod.BKGND_ADDALPHA(opacity))
 

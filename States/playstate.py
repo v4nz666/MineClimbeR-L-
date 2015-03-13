@@ -65,7 +65,6 @@ class PlayState(GameState):
     self.availableCraftingRecipes = []
     self.messages = []
 
-
   def tick(self):
     if self.player.dead():
       self.doDeathState()
@@ -382,7 +381,8 @@ class PlayState(GameState):
       .setDefaultColors(libtcod.light_azure, libtcod.azure)
     self.statPanelLeft.bgOpacity = 0
 
-    self.playerCoord = self.statPanelLeft.addElement(Elements.Label(0, 0, ""))
+    self.fps= self.statPanelLeft.addElement(Elements.Label(0, 0, "FPS "))
+    self.playerCoord = self.statPanelLeft.addElement(Elements.Label(0, 1, ""))
     self.playerMeleeStat = self.statPanelLeft.addElement(Elements.Label(0, 2, "")).setDefaultColors(libtcod.dark_green)
     self.playerRangedStat = self.statPanelLeft.addElement(Elements.Label(0, 3, "")).setDefaultColors(libtcod.dark_green)
 
@@ -563,6 +563,8 @@ class PlayState(GameState):
   ########
   # State transitions
   def doDeathState(self):
+    deathState = self._manager.getState('Death')
+    deathState.reset()
     self._manager.setNextState('Death')
 
   def quitToggle(self):
@@ -908,13 +910,13 @@ class PlayState(GameState):
     self.anchorLabel.bgOpacity = 0
     self.anchorLabel.setDefaultForeground(libtcod.silver)
 
+    self.fps.setLabel(str(libtcod.sys_get_fps()) + " FPS")
     self.playerCoord.setLabel(str((self.player.x, self.player.y)))
     self.playerCoord.setDefaultColors(libtcod.silver).bgOpacity = 0
     self.playerMeleeStat.setLabel("Melee:" + str(self.player.meleeMultiplier))
     self.playerMeleeStat.setDefaultColors(libtcod.darker_green).bgOpacity = 0
     self.playerRangedStat.setLabel("Range:" + str(self.player.rangeMultiplier))
     self.playerRangedStat.setDefaultColors(libtcod.darker_green).bgOpacity = 0
-
 
 
     if self.rangedMode:
