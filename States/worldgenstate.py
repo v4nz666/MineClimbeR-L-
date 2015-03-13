@@ -207,5 +207,6 @@ class WorldGenState(GameState):
 
   def proceed(self):
     playState = self._manager.getState('Play')
+    playState.reset()
     playState.setCave(self.cave)
     self._manager.setNextState('Play')

@@ -12,6 +12,8 @@ class PlayState(GameState):
 
   def __init__(self, name, manager, ui):
     super(PlayState, self).__init__(name, manager, ui)
+    self.torchTicks = 100
+    self.msgTtl = 100.0
 
     self.cave = None
 
@@ -22,11 +24,9 @@ class PlayState(GameState):
     self.player.collectArrows(CopperArrow, 20)
 
     self.ropePath = []
-    self.dug = None
 
     self.turnTaken = False
 
-    self.torchTicks = 100
     self.ticks = 0
 
     self.rangedMode = False
@@ -39,7 +39,32 @@ class PlayState(GameState):
     self.availableCraftingRecipes = []
 
     self.messages = []
-    self.msgTtl = 100.0
+
+  def reset(self):
+    self.cave = None
+
+    self.player = Player()
+    self.player.setChar('@')
+    self.player.setColor(libtcod.white)
+    self.player.collectPick(SteelPick)
+    self.player.collectArrows(CopperArrow, 20)
+
+    self.ropePath = []
+
+    self.turnTaken = False
+
+    self.ticks = 0
+
+    self.rangedMode = False
+    self.shooting = False
+    self.targetX = 0
+    self.targetY = 0
+
+    self.arrowCoord = None
+
+    self.availableCraftingRecipes = []
+    self.messages = []
+
 
   def tick(self):
     if self.player.dead():
