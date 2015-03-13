@@ -13,7 +13,7 @@ They say MineCorp got too greedy - dug too deep - in their search for the diamon
 unleashed  a terrible evil that lurks in the darkest depth of the mine.
 
 The sole survivor of the catastrophe - an old recluse, these days, hardly seen by anyone - was said to speak
-of monsters in the depths of the mine. People around town speak in hushed tones of an even greater treasure
+of monsters in the depths of the mine. People around town speak in hushed tones of a Great treasure
 guarded by the beasts in the deepest, darkest depths of the old mine.
 
 Grabbing an old pick from the mining museum, and a handful of rock climbing supplies, you set out to reach
