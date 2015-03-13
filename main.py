@@ -28,7 +28,7 @@ ui.init(UI_WIDTH, UI_HEIGHT, UI_FS)
 libtcod.console_set_window_title('MineClimbeR(L)')
 
 # TODO: enable
-#libtcod.console_credits()
+libtcod.console_credits()
 
 stateManager = StateManager()
 
@@ -56,7 +56,7 @@ stateManager.addState(s_Help).setBlocking(True)
 stateManager.addState(s_About).setBlocking(True)
 stateManager.addState(s_Quit)
 
-stateManager.setCurrentState('Menu')
+stateManager.setCurrentState('Title')
 
 while not ui.is_closed():
   stateManager.doTick()

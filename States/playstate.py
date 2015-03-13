@@ -546,17 +546,19 @@ class PlayState(GameState):
     count = len(self.messages)
 
     for y in range(height):
+      txt = ''
       _y = (height-1) - y
       el = self.messageElements[_y]
       if y < count:
-        msg = msg = self.messages[y]
+        msg = self.messages[y]
         msg['ttl'] -= 1
         opacity = max(0, msg['ttl'] / self.msgTtl)
-        el.setText(msg['msg'])
+        txt = msg['msg']
         el.setDefaultColors(msg['clr'])
         el.fgOpacity = opacity
-      else:
-        el.setText('')
+
+      if el._text != txt:
+        el.setText(txt)
 
     self.messages = [msg for msg in self.messages if msg['ttl'] > 0]
 
