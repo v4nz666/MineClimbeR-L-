@@ -42,6 +42,9 @@ class MenuState(GameState):
       .hide()
 
   def reset(self):
+    self.view.clear()
+    self._setupView()
+    self._setupInputs()
     self.proceeding = 0
     self.mapReady = False
     self.setBlocking(True)

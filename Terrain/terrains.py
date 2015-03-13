@@ -10,7 +10,7 @@ openBurningWood = MyTerrain(False, False, "Burning Wood")\
   .setChar("#")\
   .digs(openAir)
 caveBurningWood = MyTerrain(False, False, "Burning Wood")\
-  .setColors(libtcod.dark_flame, libtcod.lighter_blue)\
+  .setColors(libtcod.dark_flame, libtcod.light_grey)\
   .setChar("#")\
   .digs(openAir)
 

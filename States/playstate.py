@@ -17,6 +17,14 @@ class PlayState(GameState):
 
     self.cave = None
 
+    self.picks = [
+      TinPick,
+      CopperPick,
+      BronzePick,
+      IronPick,
+      SteelPick
+    ]
+
     self.player = Player()
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
@@ -41,6 +49,8 @@ class PlayState(GameState):
     self.messages = []
 
   def reset(self):
+    self.view.clear()
+
     self.cave = None
 
     self.player = Player()
@@ -775,13 +785,13 @@ class PlayState(GameState):
     self.noRoomLabel.hide()
 
   def craftItem(self, index):
+
     self.noRoomLabel.hide()
     recipe = self.availableCraftingRecipes[index]
     inInv = self.player.inventory.count(recipe['item'])
     if inInv >= recipe['item'].maxInv:
       self.noRoomLabel.show()
       return
-
     if 'dontDrop' in recipe:
       dontDrop = recipe['dontDrop']
     else:
@@ -790,6 +800,12 @@ class PlayState(GameState):
       if i not in dontDrop:
         self.player.dropItem(i)
     recipe['item'].collect(self.player)
+
+    # If we just picked up a new pick, we'll need to re-jig our pick bar.
+    if recipe['item'] in self.picks:
+      self.pickBar.setMax(self.player.maxPickStrength)
+      self.pickBar.calculateColors()
+
     self.craftingMenu._offset = 0
     self.craftingMenu.selected = 0
     self.craftingRecipe1._offset = 0
@@ -897,10 +913,8 @@ class PlayState(GameState):
     if not self.player.pickStrength:
       self.pickBar.hide()
     else:
-      self.pickBar.show()
-      self.pickBar.setMax(self.player.maxPickStrength)
       self.pickBar.setVal(self.player.pickStrength)
-      self.pickBar.calculateColors()
+      self.pickBar.show()
 
     self.ropeLabel.setLabel("Rope " + str(self.player.inventory.count(Rope)))
     self.ropeLabel.bgOpacity = 0

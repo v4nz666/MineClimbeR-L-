@@ -21,6 +21,10 @@ class DeathState(GameState):
       self.pressKey.show()
 
   def reset(self):
+    self.view.clear()
+    self._setupView()
+    self._setupInputs()
+
     self.shown = False
     self.slept = False
     self.pressKey.hide()
