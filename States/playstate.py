@@ -707,6 +707,9 @@ class PlayState(GameState):
       if self.player.y in self.dialogMessages:
         self.triggerDialog()
 
+      if self.player.y <= 6 and DragonScale in self.player.inventory:
+        self._manager.setNextState('Victory')
+
 
   def triggerDialog(self):
     if not self.dialogActive:
