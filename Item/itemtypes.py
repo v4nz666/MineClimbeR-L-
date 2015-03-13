@@ -144,7 +144,7 @@ GoblinDef = {
   'args': ['Goblin', 'g', libtcod.han, 10, 8, 6, 5],
   'ai': GoblinAi,
   'maxPath': 15,
-  'drops': Arrow,
+  'drops': String,
   'dropChance': 0.25
 }
 TrollDef = {
@@ -155,10 +155,10 @@ TrollDef = {
   'dropChance': 0.05
 }
 DragonDef = {
-  'args': ['Dragon', 'D', libtcod.dark_chartreuse, 50, 20, 25, 10],
+  'args': ['Dragon', 'D', libtcod.darker_chartreuse, 50, 20, 25, 10],
   'ai': DragonAi,
   'maxPath': 50,
-  'range': 5,
+  'range': 4,
   'drops': DragonScale,
   'dropChance': 1.0
 }
@@ -214,12 +214,12 @@ TrollSpawner.collectible = False
 TrollSpawner.spawns = TrollDef
 
 DragonSpawner = Item('')
-# DragonSpawner.genCount = 1
-# DragonSpawner.genMin = 0
-# DragonSpawner.genMax = 0.05
 DragonSpawner.genCount = 1
-DragonSpawner.genMin = 0.95
-DragonSpawner.genMax = 1.0
+DragonSpawner.genMin = 0
+DragonSpawner.genMax = 0.05
+# DragonSpawner.genCount = 1
+# DragonSpawner.genMin = 0.95
+# DragonSpawner.genMax = 1.0
 DragonSpawner.collectible = False
 DragonSpawner.spawns = DragonDef
 
@@ -247,6 +247,7 @@ Water.collect = collectWater
 
 def collectTorch(player):
   player.torchStrength = player.maxTorchStrength
+  player.needFovUpdate = True
   return True
 Torch.collect = collectTorch
 

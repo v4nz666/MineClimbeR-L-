@@ -16,25 +16,14 @@ class WorldGenState(GameState):
     self.caveH = self.view.height * 10
 
     self.cave = Cave(self.caveW, self.caveH)
-
     self.caveStartY = 5
-
-    self.mapElement = self.view.addElement(Elements.Map(0, 0, self.caveW, self.view.height, self.cave))
-    self.view.addElement(Elements.Label(self.caveW + 1, 2, "Up/Dn - Scroll"))
-    self.view.addElement(Elements.Label(self.caveW + 1, 3, "R - Regenerate Mine"))
-    self.view.addElement(Elements.Label(self.caveW + 1, 4, "P - Play this Mine"))
-    self.view.addElement(Elements.Label(self.caveW + 1, 5, "ESC - Back to Menu"))
-
-
-    self.minOffset = self.mapElement.height / 2
+    self.minOffset = self.view.height / 2
     self.maxOffset = self.caveH - self.minOffset
     self.offset = self.minOffset
 
-    self._setupInputs()
-
 
   def tick(self):
-    self.mapElement.center(0, self.offset)
+    self.proceed()
 
 
   def initCave(self):
@@ -216,51 +205,7 @@ class WorldGenState(GameState):
           pass
     return n
 
-
-  def _setupInputs(self):
-    self.inputsSet = True
-    self.view.setInputs({
-      'menuUp': {
-        'key': libtcod.KEY_UP,
-        'ch': None,
-        'fn': self.scrollUp
-      },
-      'menuDn': {
-        'key': libtcod.KEY_DOWN,
-        'ch': None,
-        'fn': self.scrollDown
-      },
-      'regenerate': {
-        'key': None,
-        'ch': 'R',
-        'fn': self.initCave
-      },
-      'proceed': {
-        'key': None,
-        'ch': 'P',
-        'fn': self.proceed
-      },
-      'back': {
-        'key': libtcod.KEY_ESCAPE,
-        'ch': None,
-        'fn': self.backToMenu
-      },
-    })
-
-  def scrollUp(self):
-    if self.offset > self.minOffset:
-      self.offset -= 1
-    pass
-  def scrollDown(self):
-    if self.offset < self.maxOffset:
-      self.offset += 1
-
   def proceed(self):
     playState = self._manager.getState('Play')
     playState.setCave(self.cave)
     self._manager.setNextState('Play')
-  def backToMenu(self):
-    menuState = self._manager.getState('Menu')
-    menuState.reset()
-    self._manager.setNextState('Menu')
-    self._manager.setNextState('Menu')
