@@ -80,6 +80,7 @@ class WorldGenState(GameState):
     caNeighboursStarve = 3
     caIterations = 5
 
+
     digCount = self.caveW * self.caveH * caDigDensity
 
     while digCount > 0:

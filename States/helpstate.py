@@ -1,6 +1,6 @@
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
-from MyElements import HelpElement
+from UiElements import HelpElement
 
 
 class HelpState(GameState):

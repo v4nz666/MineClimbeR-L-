@@ -214,12 +214,12 @@ TrollSpawner.collectible = False
 TrollSpawner.spawns = TrollDef
 
 DragonSpawner = Item('')
-DragonSpawner.genCount = 1
-DragonSpawner.genMin = 0
-DragonSpawner.genMax = 0.05
 # DragonSpawner.genCount = 1
-# DragonSpawner.genMin = 0.95
-# DragonSpawner.genMax = 1.0
+# DragonSpawner.genMin = 0
+# DragonSpawner.genMax = 0.05
+DragonSpawner.genCount = 1
+DragonSpawner.genMin = 0.95
+DragonSpawner.genMax = 1.0
 DragonSpawner.collectible = False
 DragonSpawner.spawns = DragonDef
 
