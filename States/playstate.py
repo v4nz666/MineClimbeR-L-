@@ -343,7 +343,9 @@ class PlayState(GameState):
     self.recipeLabel = self.craftFrame.addElement(Elements.Label(12, 1, "Recipe"))
     self.recipeLabel.bgOpacity = 0
 
-    self.craftingMenu = self.craftFrame.addElement(Elements.Menu(1, 2, 7, 11))
+    self.craftingMenuMaxHeight = 11
+
+    self.craftingMenu = self.craftFrame.addElement(Elements.Menu(1, 2, 7, self.craftingMenuMaxHeight))
     self.craftingMenu.bgOpacity = 0.5
     self.craftingRecipe1 = self.craftFrame.addElement(Elements.List(8, 2, 7, self.craftFrame.height - 3))
     self.craftingRecipe1.bgOpacity = 0
@@ -801,15 +803,23 @@ class PlayState(GameState):
     list2 = []
     i = 0
     for recipe in self.availableCraftingRecipes:
-      craftMenuItems.append({recipe['item'].name: self.craftItem})
+      print "Adding recipe", recipe['item'].name
+      menuItem = {recipe['item'].name: self.craftItem}
+      craftMenuItems.append(menuItem)
       r = recipe['recipe']
       list1.append(r[0].name)
       if len(r) > 1:
         list2.append(r[1].name)
       else:
         list2.append('n/a')
+    print len(craftMenuItems), "Craftable items"
+    print craftMenuItems
     self.craftingMenu.setItems(craftMenuItems)
-    self.craftingMenu.height = min(self.craftingMenu.height, len(craftMenuItems))
+
+    if len(craftMenuItems) > self.craftingMenu.height:
+      self.craftingMenu.height = min(self.craftingMenuMaxHeight, len(craftMenuItems))
+    else:
+      self.craftingMenu.height = len(craftMenuItems)
     self.craftingMenu.setDefaultColors(libtcod.lightest_azure, libtcod.darkest_azure)
 
 

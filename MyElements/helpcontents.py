@@ -1,10 +1,10 @@
 generalText = \
-  "Getting to the bottom of the mine will be no easy " + \
-  "feat. There will be many monsters along the way.  " + \
-  "That being said, gravity may be your biggest enemy.\n\n" + \
   "Win the game by traveling to the bottom of the " + \
   "mine, and returning to the surface with something " + \
   "to set the story straight.\n\n" + \
+  "Getting to the bottom of the mine will be no easy " + \
+  "feat. There will be many monsters along the way.  " + \
+  "That being said, gravity may be your biggest enemy.\n\n" + \
   "Your rope and anchors will get you places you could " + \
   "not otherwise reach.\n\n" + \
   "Dig unpassable terrain by walking into it twice in" + \
@@ -13,22 +13,22 @@ generalText = \
   "items may be picked up. Some must be crafted."
 basicsText = \
   "                     ----------------------        " + \
-  "                     |      |      |      |        " + \
-  "                     |UPLFT |  UP  | UPRGT|        " + \
-  "                     |    7 |  8   | 9    |        " + \
-  "                     ----------------------        " + \
-  "                     |      |      |      |        " + \
-  "  TAB                |LEFT  | WAIT | RIGHT|        " + \
+  "                     |      |      |      |   N    " + \
+  "                     |UPLFT |  UP  | UPRGT|   U    " + \
+  "                     |    7 |  8   | 9    |   M    " + \
+  "                     ----------------------   P    " + \
+  "                     |      |      |      |   A    " + \
+  "  TAB                |LEFT  | WAIT | RIGHT|   D    " + \
   " Crafting/Inv        |    4 |  5   | 6    |        " + \
   "                     ----------------------------- " + \
   "                     |      |      |      |    F | " + \
   "  SPACE              |DNLFT | DOWN | DNRGT|    I | " + \
-  " Toggle Climbing     |    1 |  2   | 3    | e  R | " + \
+  " Toggle Climbing     |    1 |  2   | 3    | E  R | " + \
   "   ^                 ---------------------- n  E | " + \
   "   |                 |             |      | t  B | " + \
   " this is important!  |   AIM BOW   |      | e  O | " + \
-  "                     |          0  |      | r  W | " + \
-  "                     ---------------      -------- "
+  "                     |          0  |    . | r  W | " + \
+  "                     ----------------------------- "
 
 climbingText = \
   "\nClimb around the mine by pressing the space bar. " + \
