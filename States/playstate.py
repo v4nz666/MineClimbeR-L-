@@ -38,6 +38,9 @@ class PlayState(GameState):
 
     self.availableCraftingRecipes = []
 
+    self.messages = []
+    self.msgTtl = 100.0
+
   def tick(self):
     if self.player.dead():
       self.doDeathState()
@@ -74,6 +77,12 @@ class PlayState(GameState):
       for e in self.cave.enemies:
         if self.player.distance(e.x, e.y) <= e.maxPath:
           e.aiUpdate()
+          if e.attacking():
+            dmg = e.aiAttack()
+            if dmg:
+              self.addMessage(e.name + " hit you for [" + str(dmg) + "] damage.", libtcod.dark_red)
+            else:
+              self.addMessage("You dodged the the attack")
           if self.player.dead():
             return
         else:
@@ -260,6 +269,21 @@ class PlayState(GameState):
       },
 
     })
+    self.messageBox.setInputs({
+      'addMsg': {
+        'key': None,
+        'ch': 'm',
+        'fn': self.msgTest
+      }
+    })
+
+  def msgTest(self):
+    self.addMessage("You pressed M", libtcod.dark_red)
+    print "Added message"
+
+
+
+
 
 
   def placePlayer(self):
@@ -398,14 +422,14 @@ class PlayState(GameState):
     # end crafting
     ########
 
-
-
     self.helpElement = HelpElement(self.view)
     self.helpModal = Elements.Modal(0, 0, self.view.width, self.view.height)
 
     self.view.addElement(self.helpModal)
     self.helpModal.addElement(self.helpElement)
 
+    ########
+    # Ranged mode
 
     # The overlay containing our crosshair
     self.rangedOverlay = self.mapElement.addElement(Elements.Element(0, 0, self.cave.width, self.mapElement.height))
@@ -413,6 +437,8 @@ class PlayState(GameState):
     self.rangedOverlay.bgOpacity = 0
     # Override the draw method, so we can easily draw our "+"
     self.rangedOverlay.draw = self.drawOverlay
+
+    # Cell info shown, when in ranged mode
     self.cellInfoFrame = self.view.addElement(Elements.Element(self.view.width - 15, self.statPanelRight.y - 4, 14, 4))
     self.cellInfoFrame.bgOpacity = 0.2
     self.cellInfoTerrain = self.cellInfoFrame.addElement(Elements.Text(0, 0, 14, 1))
@@ -422,15 +448,16 @@ class PlayState(GameState):
 
     self.cellInfoFrame.setDefaultColors(libtcod.light_azure, libtcod.darker_azure, True)
     self.cellInfoFrame.hide()
-
+    ########
+    # Rope indicator
     ropeIndicator = "[TIED IN]"
     ropeX = (self.view.width - len(ropeIndicator)) / 2
     ropeY = self.view.height - 2
     self.ropeIndicator = self.view.addElement(Elements.Label(ropeX, ropeY, ropeIndicator))
     self.ropeIndicator.setDefaultColors(libtcod.lightest_azure, libtcod.darker_red)
     self.ropeIndicator.hide()
-
-
+    ########
+    # Quit popup
     quitStr =  "Those rumours won't prove themselves..."
     quitCmds = " <ESC> Back               <Enter> Quit "
     quitW = len(quitStr) + 2
@@ -450,6 +477,58 @@ class PlayState(GameState):
     escEnter = quitFrame.addElement(Elements.Label(1, 2, quitCmds))
     escEnter.setDefaultColors(libtcod.light_red)
     escEnter.bgOpacity = 0
+    ########
+    # Message list
+    msgW = self.view.width / 3
+    msgX = (self.view.width - msgW) / 2
+    msgH = 5
+    msgY = self.view.height - 8
+
+    self.messageBox = Elements.Element(msgX, msgY, msgW, msgH)
+    self.messageBox.bgOpacity = 0
+    self.messageElements = [self.messageBox.addElement(Elements.Text(0, y, msgW, msgH)) for y in range(msgH)]
+
+    self.view.addElement(self.messageBox)
+
+  def addMessage(self, message, color=libtcod.white):
+    self.messages.insert(0, {'msg': message, 'ttl': self.msgTtl, 'clr': color})
+    if len(self.messages) > len(self.messageElements):
+      index = len(self.messageElements) - len(self.messages)
+      self.messages = self.messages[:index]
+
+  def removeMessage(self, message):
+    if message in self.messages:
+      self.messages.remove(message)
+      return True
+    else:
+      return False
+
+  def updateMessages(self):
+    # We'll always have a full compliment of messageElements, they just may be blank
+    height = len(self.messageElements)
+
+    # The number of messages we'll be displaying
+    count = len(self.messages)
+
+    for y in range(height):
+      _y = (height-1) - y
+      el = self.messageElements[_y]
+      if y < count:
+        msg = msg = self.messages[y]
+        msg['ttl'] -= 1
+        opacity = max(0, msg['ttl'] / self.msgTtl)
+        el.setText(msg['msg'])
+        el.setDefaultColors(msg['clr'])
+        el.fgOpacity = opacity
+      else:
+        el.setText('')
+
+    self.messages = [msg for msg in self.messages if msg['ttl'] > 0]
+
+
+
+
+
 
   def drawOverlay(self):
     con = self.rangedOverlay.console
@@ -488,8 +567,13 @@ class PlayState(GameState):
       if turnTaken:
         for e in self.cave.enemies:
           if e.x == newX and e.y == newY:
-            self.player.defAttack(e)
+            dmg = self.player.defAttack(e)
+            if dmg:
+              self.addMessage("You hit " + e.name + " for [" + str(dmg) + "] damage.", libtcod.dark_green)
+            else:
+              self.addMessage(e.name + " dodged the the attack")
             if e.dead():
+              self.addMessage("You killed the " + e.name, libtcod.green)
               if e.drops:
                 rnd = random()
                 if rnd <= e.dropChance:
@@ -542,6 +626,7 @@ class PlayState(GameState):
       for i in newCell.entities:
         try:
           if i.collectible and i.collect(self.player):
+            self.addMessage("Picked up " + i.name, libtcod.dark_yellow)
             newCell.removeEntity(i)
         except ValueError:
           pass
@@ -729,8 +814,13 @@ class PlayState(GameState):
 
     for e in self.cave.enemies:
       if e.x == newX and e.y == newY:
-        self.player.dexAttack(e)
+        dmg = self.player.dexAttack(e)
+        if dmg:
+          self.addMessage("You hit " + e.name + " for [" + str(dmg) + "] damage.", libtcod.dark_green)
+        else:
+          self.addMessage(e.name + " dodged the the attack")
         if e.dead():
+          self.addMessage("You killed the " + e.name, libtcod.green)
           if e.drops:
             rnd = random()
             if rnd <= e.dropChance:
@@ -770,6 +860,8 @@ class PlayState(GameState):
     if self.craftingModal.visible:
       self.updateCraftingUI()
       return
+
+    self.updateMessages()
 
     #update hp bar
     self.hpBar.setVal(self.player.health)

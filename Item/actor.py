@@ -38,23 +38,23 @@ class Actor(Item):
     delta = damage - defend
     if delta > 0:
       target.health -= delta
-      print self.name + " hit " + target.name + " for[" + str(delta) + "]damage!"
-      print target.name + " has[" + str(target.health) + "]health left"
+      return delta
+    else:
+      return 0
   # Pits our ranged attack against an enemy's dex stat
   def dexAttack(self, target):
     if target.dead():
       return
     atk = int(self.attack * self.rangeMultiplier)
-    print "dex attack", atk
     damage = randrange(0, atk + 1)
     defend = randrange(0, target.dex + 1)
 
     delta = damage - defend
     if delta > 0:
       target.health -= delta
-      print self.name + " ranged hit " + target.name + " for[" + str(delta) + "]damage!"
-      print target.name + " has [" + str(target.health) + "] health left"
-
+      return delta
+    else:
+      return 0
   def pickupItem(self, item):
     self.inventory.append(item)
   def dropItem(self, item):

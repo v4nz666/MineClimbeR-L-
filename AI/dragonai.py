@@ -32,6 +32,7 @@ class DragonAi(Ai):
     Ai.move(self)
 
   def doAttack(self):
+    self.attacking = False
     libtcod.line_init(self.enemy.x, self.enemy.y, self.player.x, self.player.y)
     (x, y) = libtcod.line_step()
     while not x is None:
@@ -65,8 +66,8 @@ class DragonAi(Ai):
               self.map.addEntity(self.fire, _x, _y)
       (x, y) = libtcod.line_step()
 
-    self.enemy.defAttack(self.player)
-    return True
+    return self.enemy.defAttack(self.player)
+
 
   def computePath(self, xFrom, yFrom, xTo, yTo, data):
     if self.map.getCell(xTo, yTo).passable():

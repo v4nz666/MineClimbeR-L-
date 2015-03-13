@@ -12,9 +12,12 @@ class Ai(object):
     self.waitTimeout = 0
     self.waitLeft = 0
 
+    self.attacking = False
+
   def doAttack(self):
-    self.enemy.defAttack(self.player)
-    return True
+    self.attacking = False
+    return self.enemy.defAttack(self.player)
+
 
   def update(self):
     self.move()
@@ -30,17 +33,14 @@ class Ai(object):
       self.waitLeft -= 1
 
     # In range, we can attack whether we have a path or not.
-    if pathSize <= self.enemy.range:
+    if hasPath and pathSize <= self.enemy.range:
       # Time to attack
       if self.waitLeft == 0:
-        # If the attack succeeds, reset the wait timer
-        if self.doAttack():
-          self.waitLeft = self.waitTimeout
-          return True
-        # else, try repositioning
-        else:
-          return self.reposition()
-      # Still waiting, jostle around a bit
+        # Reset the wait timer
+        self.attacking = True
+        self.waitLeft = self.waitTimeout
+        return True
+      #Still waiting, jostle around a bit
       else:
         return self.reposition()
 

@@ -18,3 +18,11 @@ class Enemy(Actor):
   def aiUpdate(self):
     if self._ai:
       self._ai.update()
+      return True
+    return False
+
+  def aiAttack(self):
+    return self._ai.doAttack()
+
+  def attacking(self):
+    return self._ai.attacking
