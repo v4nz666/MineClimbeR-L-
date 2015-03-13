@@ -23,11 +23,27 @@ the depths of the old mine, and determine once and for all the truth about the r
 
 ### Started 2:00PM AST Saturday Mar 7th, 2015
 
-## Gameplay
+## Gameplay Features
 
 - Side view, gravity-driven mine exploration
-- Turn-based combat mechanics, but torch strength diminishes in real time
+- Turn-based combat mechanics, but torch burns down in real time
 - Rock climbing mechanics - attach ropes to anchors to climb to otherwise inaccessible areas of the mine
 - Simple crafting mechanic to repair your tools, build new anchors, weapons, arrows,etc
 - Ranged / Melee combat
 - Damage / "health" multipliers for materials used during crafting - Tin, Copper, Bronze, Iron, Steel, Diamond
+ 
+## Getting started/Installation:
+To run the game, on Linux, at least for now (pre-packaged binaries to come - hopefully for windows/mac, too) simply clone this repository with the --recursive flag to pull in the RoguePy submodule:
+
+    git clone --recursive git@github.com:v4nz666/MineClimbeR-L-.git
+
+and run the game with:
+
+    python main.py
+  
+## Tips and tricks
+
+- Your torch burns down in real-time, whether you've taken a turn, or not. This includes in the inventory/crafting menu. Don't dilly dally! You'll want to replenish your torch light, periodically, through the crafting menu (TAB).
+- Be very careful digging down in any way (straight down, or diagonally). You're likely to fall to your death.
+- Always clip in (space bar) before moving, if you don't know what's below your destination tile.
+- Ranged attacks can help you keep a distance from your enemies, and can save you some much needed HP. Press the 0 key on the numpad to aim your bow (and again to cancel your shot), and the Enter key on the numpad to fire.
