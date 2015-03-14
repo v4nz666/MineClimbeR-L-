@@ -59,10 +59,8 @@ class Actor(Item):
     self.inventory.append(item)
   def dropItem(self, item):
     if not item in self.inventory:
-      print "don't got one"
       return False
     else:
-      print "removing ", item.name
       self.inventory.remove(item)
       return True
 

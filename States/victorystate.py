@@ -30,12 +30,19 @@ class VictoryState(GameState):
     heroY = conY + 6
 
     heroLabel = Elements.Label(heroX, heroY, hero).setDefaultColors(libtcod.green)
-
     heroLabel.hide()
-
+    
+    still = "Still though. Would have been nice if there had been a treasure. :("
+    
+    stillX = (self.view.width - len(still)) / 2
+    stillY = heroY + 2
+    stillLabel = Elements.Label(stillX, stillY, still).setDefaultColors(libtcod.grey)
+    stillLabel.hide()
+    
     self.frames = [
       self.view.addElement(storyText),
       self.view.addElement(heroLabel),
+      self.view.addElement(stillLabel)
     ]
 
 

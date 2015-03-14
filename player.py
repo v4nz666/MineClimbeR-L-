@@ -25,9 +25,7 @@ class Player(Actor):
     self.maxFallHeight = 2
 
     self.attached = False
-    self.inventory = \
-      [Anchor for i in range(self.startingAnchors)] + \
-      [Rope for i in range(self.ropeCount)] + [Bow] + [Venom, Coal, String, Thread, Thread, Silk, Silk, Wood, Water, Tin, Copper, Bronze, Iron, Diamond, Diamond]
+    self.inventory = [Anchor for i in range(self.startingAnchors)] + [Rope for i in range(self.ropeCount)] + [Silk, Silk, Silk, Silk]
 
   def collectPick(self, pick):
     self.maxPickStrength = int(pick.material.multiplier * self.basePickStrength)
@@ -63,8 +61,10 @@ class Player(Actor):
     self.attached = False
 
   def land(self):
+    delta = 0
     if self.fell > self.maxFallHeight:
       delta = pow(self.fallDamage, self.fell - self.maxFallHeight)
       self.health -= delta
     self.falling = False
     self.fell = 0
+    return delta

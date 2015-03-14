@@ -12,8 +12,10 @@ class PlayState(GameState):
 
   def __init__(self, name, manager, ui):
     super(PlayState, self).__init__(name, manager, ui)
-    self.torchTicks = 100
-    self.msgTtl = 100.0
+    self.torchTicks = 150
+    self.healthTicks = 500
+
+    self.msgTtl = 150.0
     self.dialogTicks = 0
 
     self.cave = None
@@ -49,6 +51,7 @@ class PlayState(GameState):
     self.availableCraftingRecipes = []
 
     self.messages = []
+    self.messageOnDeck = None
 
     self.dialogMessages = {
       7: "I should be ok, if I'm careful.",
@@ -76,8 +79,7 @@ class PlayState(GameState):
     self.player = Player()
     self.player.setChar('@')
     self.player.setColor(libtcod.white)
-    self.player.collectPick(SteelPick)
-    self.player.collectArrows(CopperArrow, 20)
+    self.player.collectPick(CopperPick)
 
     self.ropePath = []
 
@@ -107,13 +109,20 @@ class PlayState(GameState):
     if not self.ticks % self.torchTicks:
       self.player.torchStrength = max(2, self.player.torchStrength - 1)
       self.player.needFovUpdate = True
+      print "torch tick"
+    if not self.ticks % self.healthTicks:
+      print "health tick"
+      self.player.torchStrength = max(0, self.player.health - 1)
 
     if self.player.falling:
       if self.cave.getCell(self.player.x, self.player.y + 1).passable():
         self.player.fell += 1
         self.mvPlayer(0, 1, self.player.moveD, False)
       else:
-        self.player.land()
+        # if some damage was done from the fall
+        damage = self.player.land()
+        if damage:
+          self.showFlashMessage("Ouch! " + str(damage) + " damage...", libtcod.dark_red)
         self.turnTaken = True
     elif (not self.player.attached) and self.cave.getCell(self.player.x, self.player.y + 1).passable():
       self.player.falling = True
@@ -126,7 +135,9 @@ class PlayState(GameState):
     self._updateUI()
 
     if self.dialogActive:
-      self.updateDialogMessage()
+      self.updateInnerDialogMessage()
+    elif self.messageOnDeck:
+      self.triggerStagedMessage()
 
     ########
 
@@ -328,22 +339,6 @@ class PlayState(GameState):
       },
 
     })
-    self.messageBox.setInputs({
-      'addMsg': {
-        'key': None,
-        'ch': 'm',
-        'fn': self.msgTest
-      }
-    })
-
-  def msgTest(self):
-    self.addMessage("You pressed M", libtcod.dark_red)
-    print "Added message"
-
-
-
-
-
 
   def placePlayer(self):
     playerX = 1
@@ -511,13 +506,26 @@ class PlayState(GameState):
 
     self.cellInfoFrame.setDefaultColors(libtcod.light_azure, libtcod.darker_azure, True)
     self.cellInfoFrame.hide()
+    
+    noBow = "!NO BOW!"
+    noBowX = (self.view.width - len(noBow)) / 2
+    noBowY = 1
+    self.noBow = Elements.Label(noBowX, noBowY, noBow).setDefaultColors(libtcod.dark_red)
+    self.rangedOverlay.addElement(self.noBow).hide()
+    
+    noArrow = "!NO ARROWS!"
+    noArrowX = (self.view.width - len(noArrow)) / 2
+    noArrowY = 2
+    self.noArrow = Elements.Label(noArrowX, noArrowY, noArrow).setDefaultColors(libtcod.dark_red)
+    self.rangedOverlay.addElement(self.noArrow).hide()
+
     ########
     # Rope indicator
     ropeIndicator = "[TIED IN]"
     ropeX = (self.view.width - len(ropeIndicator)) / 2
     ropeY = self.view.height - 2
     self.ropeIndicator = self.view.addElement(Elements.Label(ropeX, ropeY, ropeIndicator))
-    self.ropeIndicator.setDefaultColors(libtcod.lightest_azure, libtcod.darker_red)
+    self.ropeIndicator.setDefaultColors(libtcod.lightest_azure, libtcod.darker_green)
     self.ropeIndicator.hide()
     ########
     # Quit popup
@@ -605,6 +613,7 @@ class PlayState(GameState):
   def doDeathState(self):
     deathState = self._manager.getState('Death')
     deathState.reset()
+    self.setBlocking(True)
     self._manager.setNextState('Death')
 
   def quitToggle(self):
@@ -692,9 +701,12 @@ class PlayState(GameState):
       # Collect any items in the new cell
       for i in newCell.entities:
         try:
-          if i.collectible and i.collect(self.player):
-            self.addMessage("Picked up " + i.name, libtcod.dark_yellow)
-            newCell.removeEntity(i)
+          if i.collectible:
+            if i.collect(self.player):
+              self.addMessage("Picked up " + i.name, libtcod.dark_yellow)
+              newCell.removeEntity(i)
+            else:
+              self.addMessage("Inventory full of " + i.name, libtcod.darker_yellow)
         except ValueError:
           pass
 
@@ -705,32 +717,36 @@ class PlayState(GameState):
       self.cave.addEntity(self.player, self.player.x, self.player.y)
 
       if self.player.y in self.dialogMessages:
-        self.triggerDialog()
+        self.triggerInnerDialogMessage()
 
       if self.player.y <= 6 and DragonScale in self.player.inventory:
         self._manager.setNextState('Victory')
 
 
-  def triggerDialog(self):
+  def triggerInnerDialogMessage(self):
+    msg = self.dialogMessages[self.player.y]
     if not self.dialogActive:
-      self.showDialog()
+      self.showFlashMessage(msg)
     else:
-      print "queueing dialog message"
+      self.messageOnDeck = msg
     del self.dialogMessages[self.player.y]
 
-  def showDialog(self):
+
+  def showFlashMessage(self, msg, color=libtcod.white):
     self.dialogActive = True
     self.dialogTicks = self.msgTtl
+    if not msg:
+      msg = self.dialogMessages[self.player.y]
 
-    msg = self.dialogMessages[self.player.y]
     (x, y) = self.findDialogCoords(msg)
     self.dialogLabel.x = x
     self.dialogLabel.y = y
     self.dialogLabel.setLabel(msg)
+    self.dialogLabel.setDefaultColors(color)
     self.dialogLabel.show()
-    print "Showing dialog at ", (x, y)
 
-  def updateDialogMessage(self):
+
+  def updateInnerDialogMessage(self):
     self.dialogTicks -= 1
     o = self.dialogTicks / self.msgTtl
     if o > 0:
@@ -739,6 +755,10 @@ class PlayState(GameState):
       self.dialogLabel.hide()
       self.dialogActive = False
 
+  def triggerStagedMessage(self):
+    message = self.messageOnDeck
+    self.showFlashMessage(message)
+    self.messageOnDeck = None
 
   def findDialogCoords(self, msg):
     x = max(0, min(self.player.x - 8, self.view.width - len(msg)))
@@ -905,7 +925,6 @@ class PlayState(GameState):
     self.player.dropItem(Arrow)
 
     self.shooting = True
-    print "initing line", self.player.x, self.player.y, self.targetX, self.targetY
     libtcod.line_init(self.player.x, self.player.y, self.targetX, self.targetY)
 
 
@@ -1012,6 +1031,15 @@ class PlayState(GameState):
       self.rangedOverlay.show()
       self.cellInfoFrame.show()
       self.cellInfoUpdate()
+
+      if not Bow in self.player.inventory:
+        self.noBow.show()
+      else:
+        self.noBow.hide()
+      if not Arrow in self.player.inventory:
+        self.noArrow.show()
+      else:
+        self.noArrow.hide()
     else:
       self.rangedOverlay.hide()
       self.cellInfoFrame.hide()

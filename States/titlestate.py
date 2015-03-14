@@ -10,15 +10,17 @@ class TitleState(GameState):
     self._setupInputs()
 
   def _setupView(self):
-    title = "The Mustached Archer"
+    title = "CaveClimbeR(L)"
     titleX = (self.view.width - len(title)) / 2
-    titleY = self.view.height / 2
+    titleY = self.view.height / 2 - 1
+    _7drl = "a 7dRL"
+    _7drlX = (self.view.width - len(_7drl)) / 2
     credits = "2015 - Jeff Ripley"
     creditsX = (self.view.width - len(credits)) / 2
 
-    self.view.addElement(Elements.Label(titleX, titleY, title))
-    self.view.addElement(Elements.Label(creditsX, titleY + 2, credits))
-
+    self.view.addElement(Elements.Label(titleX, titleY, title)).setDefaultColors(libtcod.gold)
+    self.view.addElement(Elements.Label(_7drlX, titleY+1, _7drl)).setDefaultColors(libtcod.grey)
+    self.view.addElement(Elements.Label(creditsX, titleY + 2, credits)).setDefaultColors(libtcod.silver)
 
   def _setupInputs(self):
     self.view.setInputs({
@@ -29,7 +31,6 @@ class TitleState(GameState):
       }
     })
     pass
-
 
   def proceed(self):
     self._manager.setNextState('Story')
