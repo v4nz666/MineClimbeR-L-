@@ -62,12 +62,15 @@ class MyMapElement(Elements.Map):
             # Now that we've spawned any enemies, just remove any spawners that were in the list
             c.entities = [e for e in c.entities if not e.spawns]
 
-            # Render the top item, if there are any here. Player takes precedence,though
+            # Render the top item, if there are any here. Player will be rendered last, specially.
             if self.player in c.entities:
-              item = self.player
+              continue
             elif len(c.entities) > 0:
               item = c.entities[-1]
             libtcod.console_put_char_ex(self.console, x, onScreenY, item.char, item.color, c.terrain.bg)
+    (x, y) = self.onScreen(self.player.x, self.player.y)
+    c = self._map.getCell(x, self.player.y)
+    libtcod.console_put_char_ex(self.console, x, y, self.player.char, self.player.color, c.terrain.bg)
 
   def renderFovOverlay(self, cell, x, y, inTorch):
     """

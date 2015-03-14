@@ -54,26 +54,25 @@ class PlayState(GameState):
     self.messageOnDeck = None
 
     self.dialogMessages = {
-      7: "I should be ok, if I'm careful.",
-      10: "This shouldn't be so bad.",
-      25: "I hope this torch lasts...",
-      50: "I wish I had my bow...",
-      100: "I should have brought some water...",
-      175: "Monsters? What monsters?",
-      200: "It's just bats and spiders in here...",
-      290: "It's getting really dark...",
-      295: "What are those letters carved into the wall?",
-      300: "Doesn't look like any writing I've seen...",
-      400: "Where did these creatures come from?",
-      500: "Maybe they did set off the explosions...",
-      575: "It's getting really warm in here.",
-      580: "What was that rumbling sound?",
-      590: "No one will believe me!"
-    }
+    7: '"I should be ok, if I\'m careful..."',
+    25: '"I hope this torch lasts..."',
+    50: '"I wish I had my bow..."',
+    100: '"I should have brought some water..."',
+    175: '"Monsters? What monsters?..."',
+    200: '"It\'s just bats and spiders in here..."',
+    290: '"It\'s getting really dark..."',
+    295: '"What are those letters carved into the wall?..."',
+    300: '"Doesn\'t look like any writing I\'ve seen..."',
+    400: '"Where did these creatures come from?..."',
+    500: '"Maybe MineCorp did set off the explosions..."',
+    575: '"It\'s getting really warm in here..."',
+    580: '"What was that rumbling sound?..."',
+    590: '"No one will believe me!"'
+  }
 
   def reset(self):
     self.view.clear()
-
+    self.setBlocking(False)
     self.cave = None
 
     self.player = Player()
@@ -140,7 +139,8 @@ class PlayState(GameState):
       self.triggerStagedMessage()
 
     ########
-
+    if self.player.dead():
+      return
     ########
     # Turn -based updates
     if self.turnTaken:
@@ -150,9 +150,9 @@ class PlayState(GameState):
           if e.attacking():
             dmg = e.aiAttack()
             if dmg:
-              self.addMessage(e.name + " hit you for [" + str(dmg) + "] damage.", libtcod.dark_red)
+              self.showFlashMessage(e.name + " hit you for [" + str(dmg) + "] damage.", libtcod.dark_red)
             else:
-              self.addMessage("You dodged the the attack")
+              self.showFlashMessage("You dodged the the attack")
           if self.player.dead():
             return
         else:
@@ -509,13 +509,13 @@ class PlayState(GameState):
     
     noBow = "!NO BOW!"
     noBowX = (self.view.width - len(noBow)) / 2
-    noBowY = 1
+    noBowY = self.view.height - 2
     self.noBow = Elements.Label(noBowX, noBowY, noBow).setDefaultColors(libtcod.dark_red)
     self.rangedOverlay.addElement(self.noBow).hide()
     
     noArrow = "!NO ARROWS!"
     noArrowX = (self.view.width - len(noArrow)) / 2
-    noArrowY = 2
+    noArrowY = noBowY - 1
     self.noArrow = Elements.Label(noArrowX, noArrowY, noArrow).setDefaultColors(libtcod.dark_red)
     self.rangedOverlay.addElement(self.noArrow).hide()
 
@@ -523,7 +523,7 @@ class PlayState(GameState):
     # Rope indicator
     ropeIndicator = "[TIED IN]"
     ropeX = (self.view.width - len(ropeIndicator)) / 2
-    ropeY = self.view.height - 2
+    ropeY = self.view.height - 1
     self.ropeIndicator = self.view.addElement(Elements.Label(ropeX, ropeY, ropeIndicator))
     self.ropeIndicator.setDefaultColors(libtcod.lightest_azure, libtcod.darker_green)
     self.ropeIndicator.hide()
@@ -554,54 +554,6 @@ class PlayState(GameState):
     msgX = (self.view.width - msgW) / 2
     msgH = 5
     msgY = self.view.height - 8
-
-    self.messageBox = Elements.Element(msgX, msgY, msgW, msgH)
-    self.messageBox.bgOpacity = 0
-    self.messageElements = [self.messageBox.addElement(Elements.Text(0, y, msgW, msgH)) for y in range(msgH)]
-
-    self.view.addElement(self.messageBox)
-
-  def addMessage(self, message, color=libtcod.white):
-    self.messages.insert(0, {'msg': message, 'ttl': self.msgTtl, 'clr': color})
-    if len(self.messages) > len(self.messageElements):
-      index = len(self.messageElements) - len(self.messages)
-      self.messages = self.messages[:index]
-
-  def removeMessage(self, message):
-    if message in self.messages:
-      self.messages.remove(message)
-      return True
-    else:
-      return False
-
-  def updateMessages(self):
-    # We'll always have a full compliment of messageElements, they just may be blank
-    height = len(self.messageElements)
-
-    # The number of messages we'll be displaying
-    count = len(self.messages)
-
-    for y in range(height):
-      txt = ''
-      _y = (height-1) - y
-      el = self.messageElements[_y]
-      if y < count:
-        msg = self.messages[y]
-        msg['ttl'] -= 1
-        opacity = max(0, msg['ttl'] / self.msgTtl)
-        txt = msg['msg']
-        el.setDefaultColors(msg['clr'])
-        el.fgOpacity = opacity
-
-      if el._text != txt:
-        el.setText(txt)
-
-    self.messages = [msg for msg in self.messages if msg['ttl'] > 0]
-
-
-
-
-
 
   def drawOverlay(self):
     con = self.rangedOverlay.console
@@ -645,11 +597,11 @@ class PlayState(GameState):
           if e.x == newX and e.y == newY:
             dmg = self.player.defAttack(e)
             if dmg:
-              self.addMessage("You hit " + e.name + " for [" + str(dmg) + "] damage.", libtcod.dark_green)
+              self.showFlashMessage("You hit " + e.name + " for [" + str(dmg) + "] damage.", libtcod.dark_green)
             else:
-              self.addMessage(e.name + " dodged the the attack")
+              self.showFlashMessage(e.name + " dodged the the attack", libtcod.grey)
             if e.dead():
-              self.addMessage("You killed the " + e.name, libtcod.green)
+              self.showFlashMessage("You killed the " + e.name, libtcod.light_green)
               if e.drops:
                 rnd = random()
                 if rnd <= e.dropChance:
@@ -703,10 +655,10 @@ class PlayState(GameState):
         try:
           if i.collectible:
             if i.collect(self.player):
-              self.addMessage("Picked up " + i.name, libtcod.dark_yellow)
+              self.showFlashMessage("Picked up " + i.name, libtcod.dark_yellow)
               newCell.removeEntity(i)
             else:
-              self.addMessage("Inventory full of " + i.name, libtcod.darker_yellow)
+              self.showFlashMessage("Inventory full of " + i.name, libtcod.darker_yellow)
         except ValueError:
           pass
 
@@ -726,7 +678,7 @@ class PlayState(GameState):
   def triggerInnerDialogMessage(self):
     msg = self.dialogMessages[self.player.y]
     if not self.dialogActive:
-      self.showFlashMessage(msg)
+      self.showFlashMessage(msg, libtcod.grey * 0.8)
     else:
       self.messageOnDeck = msg
     del self.dialogMessages[self.player.y]
@@ -757,16 +709,16 @@ class PlayState(GameState):
 
   def triggerStagedMessage(self):
     message = self.messageOnDeck
-    self.showFlashMessage(message)
+    self.showFlashMessage(message, libtcod.grey * 0.8)
     self.messageOnDeck = None
 
   def findDialogCoords(self, msg):
     x = max(0, min(self.player.x - 8, self.view.width - len(msg)))
-    y =  self.player.y + 3
+    y =  self.player.y + 11
 
     (x, y) = self.mapElement.onScreen(x, y)
     if y > self.view.height - 1:
-      y = self.player.y - 3
+      y = self.player.y - 11
     return x, y
 
   def ropeToggle(self):
@@ -953,11 +905,11 @@ class PlayState(GameState):
       if e.x == newX and e.y == newY:
         dmg = self.player.dexAttack(e)
         if dmg:
-          self.addMessage("You hit " + e.name + " for [" + str(dmg) + "] damage.", libtcod.dark_green)
+          self.showFlashMessage("You hit " + e.name + " for [" + str(dmg) + "] damage.", libtcod.dark_green)
         else:
-          self.addMessage(e.name + " dodged the the attack")
+          self.showFlashMessage(e.name + " dodged the the attack")
         if e.dead():
-          self.addMessage("You killed the " + e.name, libtcod.green)
+          self.showFlashMessage("You killed the " + e.name, libtcod.green)
           if e.drops:
             rnd = random()
             if rnd <= e.dropChance:
@@ -997,8 +949,6 @@ class PlayState(GameState):
     if self.craftingModal.visible:
       self.updateCraftingUI()
       return
-
-    self.updateMessages()
 
     #update hp bar
     self.hpBar.setVal(self.player.health)
