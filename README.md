@@ -37,7 +37,7 @@ Short gameplay teaser available at http://youtu.be/XO8oqFJ9gUg
 ## Getting started/Installation:
 To run the game, on Linux, at least for now (pre-packaged binaries to come - hopefully for windows/mac, too) simply clone this repository with the --recursive flag to pull in the RoguePy submodule:
 
-    git clone --recursive git@github.com:v4nz666/MineClimbeR-L-.git
+    git clone git@github.com:v4nz666/MineClimbeR-L-.git
 
 pygame is required for the audio
 
