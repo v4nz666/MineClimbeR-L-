@@ -70,6 +70,22 @@ class MenuState(GameState):
         'ch': None,
         'fn': self.menu.selectFn
       },
+      'menuUpKP': {
+        'key': libtcod.KEY_KP8,
+        'ch': None,
+        'fn': self.menu.selectUp
+      },
+      'menuDnKP': {
+        'key': libtcod.KEY_KP2,
+        'ch': None,
+        'fn': self.menu.selectDown
+      },
+      'menuSelectKP': {
+        'key': libtcod.KEY_KPENTER,
+        'ch': None,
+        'fn': self.menu.selectFn
+      },
+
     })
 
   def tick(self):

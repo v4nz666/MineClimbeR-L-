@@ -164,7 +164,10 @@ class PlayState(GameState):
     if self.turnTaken:
       for e in self.cave.enemies:
         if self.player.distance(e.x, e.y) <= e.maxPath:
-          e.aiUpdate()
+          # If we weren't able to move (noPath, etc), reposition
+          if not e.aiUpdate():
+            e.idleUpdate()
+            return
           if e.attacking():
             dmg = e.aiAttack()
             if dmg:
@@ -176,7 +179,7 @@ class PlayState(GameState):
           if self.player.dead():
             return
         else:
-          pass
+          e.idleUpdate()
 
     ########
     self.turnTaken = False

@@ -17,8 +17,8 @@ class Enemy(Actor):
 
   def aiUpdate(self):
     if self._ai:
-      self._ai.update()
-      return True
+      return self._ai.update()
+
     return False
 
   def aiAttack(self):
@@ -26,3 +26,6 @@ class Enemy(Actor):
 
   def attacking(self):
     return self._ai.attacking
+
+  def idleUpdate(self):
+    self._ai.reposition()

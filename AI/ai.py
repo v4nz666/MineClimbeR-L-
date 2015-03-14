@@ -20,7 +20,7 @@ class Ai(object):
 
 
   def update(self):
-    self.move()
+    return self.move()
 
   def move(self):
     if self.path:
@@ -33,16 +33,18 @@ class Ai(object):
       self.waitLeft -= 1
 
     # In range, we can attack whether we have a path or not.
-    if hasPath and pathSize <= self.enemy.range:
-      # Time to attack
-      if self.waitLeft == 0:
-        # Reset the wait timer
-        self.attacking = True
-        self.waitLeft = self.waitTimeout
-        return True
-      #Still waiting, jostle around a bit
-      else:
-        return self.reposition()
+    if hasPath:
+      if pathSize <= self.enemy.range:
+        # Our attack timer has elapsed
+        if self.waitLeft == 0:
+          # Reset the wait timer
+          self.attacking = True
+          self.waitLeft = self.waitTimeout
+          return True
+        # Not yet time to attack, jostle around a bit
+        else:
+          return False
+
 
     if hasPath:
       if pathSize > 0:
@@ -52,6 +54,8 @@ class Ai(object):
           return True
         except ValueError:
           pass
+    else:
+      return False
 
     return False
   def moveEnemy(self, newX, newY):
@@ -65,16 +69,17 @@ class Ai(object):
     # Try 8 times to find a suitable spot around us, stay put if we fail
     for attempt in range(8):
       while True:
-        x = randrange(-1,2)
-        y = randrange(-1,2)
-        if (x or y) and not (x < 0 or y < 0 or x >= self.map.width or y >= self.map.height):
+        deltaX = randrange(-1,2)
+        deltaY = randrange(-1,2)
+        newX = self.enemy.x + deltaX
+        newY = self.enemy.y + deltaY
+        if (deltaX or deltaY) and not (newX < 0 or newY < 0 or newX >= self.map.width or newY >= self.map.height):
           break
-      x = self.enemy.x + x
-      y = self.enemy.y + y
-      cell = self.map.getCell(x, y)
-      if cell.passable():
-        self.moveEnemy(x, y)
-        return
+
+      if self.computePath(self.enemy.x, self.enemy.y, newX, newY, 1):
+        self.moveEnemy(newX, newY)
+        return True
+    return False
 
   def computePath(self, xFrom, yFrom, xTo, yTo, data):
     return 1.0
