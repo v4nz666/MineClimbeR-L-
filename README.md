@@ -41,7 +41,7 @@ To run the game, on Linux, at least for now (pre-packaged binaries to come - hop
 
 pygame is required for the audio
 
-    pip install pygame
+http://www.pygame.org
 
 and run the game with:
 
