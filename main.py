@@ -1,3 +1,6 @@
+from pygame import mixer
+mixer.init()
+
 from States import *
 from RoguePy import setFps
 from RoguePy.libtcod import libtcod
@@ -17,9 +20,9 @@ FPS = 60
 UI_WIDTH = 105
 UI_HEIGHT = 60
 UI_FONT_SIZE = 12
-UI_FSRES_X = UI_WIDTH * UI_FONT_SIZE
-UI_FSRES_Y = UI_HEIGHT * UI_FONT_SIZE
-UI_FS = False
+UI_FSRES_X = 1280
+UI_FSRES_Y = 720
+UI_FS = True
 
 setFps(FPS)
 libtcod.sys_force_fullscreen_resolution(UI_FSRES_X, UI_FSRES_Y)
@@ -58,5 +61,9 @@ stateManager.addState(s_Quit)
 
 stateManager.setCurrentState('Title')
 
+mixer.init()
+
 while not ui.is_closed():
   stateManager.doTick()
+
+mixer.quit()

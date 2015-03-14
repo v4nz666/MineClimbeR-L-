@@ -49,10 +49,9 @@ climbingText = \
 craftingText = \
   "You'll need to craft some items to make it down " + \
   "and back again.\n\n" + \
-  "Bring up the crafting menu with TAB. Any items you" + \
-  " can currently craft will be shown in white. Any " + \
-  "you've made before, but lack the materials for " + \
-  "will be greyed out.\n\n" + \
+  "Bring up the crafting menu with TAB. Any items you " + \
+  "can currently craft will be shown in a list. " + \
+  "Select an item to craft it.\n\n" + \
   "You may craft new anchors with a single metal ore." + \
   " You may also repair your torch with one coal and " + \
   "one wood, or your pick with one wood and one \n" + \

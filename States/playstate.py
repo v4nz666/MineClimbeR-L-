@@ -7,6 +7,7 @@ from Item.itemtypes import *
 from Terrain.terrains import lava
 from RoguePy.libtcod import libtcod
 from RoguePy.State.GameState import GameState
+from pygame import mixer
 
 class PlayState(GameState):
 
@@ -17,6 +18,8 @@ class PlayState(GameState):
 
     self.msgTtl = 150.0
     self.dialogTicks = 0
+
+    self.soundInitialized = False
 
     self.cave = None
 
@@ -97,7 +100,23 @@ class PlayState(GameState):
     self.availableCraftingRecipes = []
     self.messages = []
 
+  def initSound(self):
+    self.combatHitSound = mixer.Sound('./sounds/combatHit.wav')
+    self.combatMissSound = mixer.Sound('./sounds/combatMis.wav')
+    self.craftSound = mixer.Sound('./sounds/craft.wav')
+    self.dieSound = mixer.Sound('./sounds/die.wav')
+    self.digSound = mixer.Sound('./sounds/dig.wav')
+    self.fallSound = mixer.Sound('./sounds/fall.wav')
+    self.pickupSound = mixer.Sound('./sounds/pickup.wav')
+
+    mixer.music.load('./sounds/3158__suonho__suonho-hypersuspance.wav')
+    mixer.music.play(-1)
+
   def tick(self):
+    if not self.soundInitialized:
+      self.initSound()
+      self.soundInitialized = True
+
     if self.player.dead():
       self.doDeathState()
     if self.shooting:
@@ -116,8 +135,9 @@ class PlayState(GameState):
         self.player.fell += 1
         self.mvPlayer(0, 1, self.player.moveD, False)
       else:
-        # if some damage was done from the fall
         damage = self.player.land()
+        self.fallSound.play()
+        # if some damage was done from the fall
         if damage:
           self.showFlashMessage("Ouch! " + str(damage) + " damage...", libtcod.dark_red)
         self.turnTaken = True
@@ -148,8 +168,10 @@ class PlayState(GameState):
           if e.attacking():
             dmg = e.aiAttack()
             if dmg:
+              self.combatHitSound.play()
               self.showFlashMessage(e.name + " hit you for [" + str(dmg) + "] damage.", libtcod.dark_red)
             else:
+              self.combatMissSound.play()
               self.showFlashMessage("You dodged the the attack")
           if self.player.dead():
             return
@@ -561,6 +583,7 @@ class PlayState(GameState):
   ########
   # State transitions
   def doDeathState(self):
+    self.dieSound.play()
     deathState = self._manager.getState('Death')
     deathState.reset()
     self.setBlocking(True)
@@ -595,8 +618,10 @@ class PlayState(GameState):
           if e.x == newX and e.y == newY:
             dmg = self.player.defAttack(e)
             if dmg:
+              self.combatHitSound.play()
               self.showFlashMessage("You hit " + e.name + " for [" + str(dmg) + "] damage.", libtcod.dark_green)
             else:
+              self.combatMissSound.play()
               self.showFlashMessage(e.name + " dodged the the attack", libtcod.grey)
             if e.dead():
               self.showFlashMessage("You killed the " + e.name, libtcod.light_green)
@@ -653,6 +678,7 @@ class PlayState(GameState):
         try:
           if i.collectible:
             if i.collect(self.player):
+              self.pickupSound.play()
               self.showFlashMessage("Picked up " + i.name, libtcod.dark_yellow)
               newCell.removeEntity(i)
             else:
@@ -830,7 +856,6 @@ class PlayState(GameState):
     self.noRoomLabel.hide()
 
   def craftItem(self, index):
-
     self.noRoomLabel.hide()
     recipe = self.availableCraftingRecipes[index]
     inInv = self.player.inventory.count(recipe['item'])
@@ -845,6 +870,7 @@ class PlayState(GameState):
       if i not in dontDrop:
         self.player.dropItem(i)
     recipe['item'].collect(self.player)
+    self.craftSound.play()
 
     # If we just picked up a new pick, we'll need to re-jig our pick bar.
     if recipe['item'] in self.picks:
@@ -927,7 +953,7 @@ class PlayState(GameState):
     if not self.player.damagePick():
       return False
     cell = self.cave.getCell(x, y)
-
+    self.digSound.play()
     oldTerrain = cell.terrain
     newTerrain = oldTerrain.digTerrain
     cell.setTerrain(newTerrain)

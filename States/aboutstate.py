@@ -37,10 +37,9 @@ class AboutState(GameState):
 
     aboutText =\
       "Built using my as-yet unreleased libtcod framework, RoguePy.\n\n" + \
-      "This is the first project I've undertaken, other than tech demos, with the RoguePy framework " + \
-      "and, while it's been quite useful, and saved me lots of time, I've  come across many shortcomings, " + \
-      "where I've needed to insert my own class to provide the functionality I've needed to make a worthwhile " + \
-      "game.\n\n" + \
+      "This is the first project I've undertaken, other than tech demos, with the RoguePy framework. " + \
+      "It's been quite useful, and saved me lots of time, and, in writing this game, I've  come up with many " + \
+      "new features that will make excellent additions to RoguePy.\n\n" + \
       "I'm looking forward to adding these features to the framework before release time.\n\n" + \
       "Watch https://github.com/v4nz666/RoguePy for updates."
 

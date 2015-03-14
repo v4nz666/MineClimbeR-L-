@@ -3,6 +3,9 @@ from Item.item import Item
 from AI import *
 #from enemies import *
 from RoguePy.libtcod import libtcod
+from pygame import mixer
+
+waterSound = mixer.Sound('./sounds/water.wav')
 
 Tin = Ore('Tin')
 Tin.setColor(libtcod.Color(211, 212, 213))
@@ -207,6 +210,7 @@ DragonSpawner.spawns = DragonDef
 # overridden collect methods
 def collectWater(player):
   player.health = min(player.maxHealth, player.health + 25)
+  waterSound.play()
   return True
 Water.collect = collectWater
 
