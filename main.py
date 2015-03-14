@@ -22,7 +22,7 @@ UI_HEIGHT = 60
 UI_FONT_SIZE = 12
 UI_FSRES_X = 1280
 UI_FSRES_Y = 720
-UI_FS = False
+UI_FS = True
 
 setFps(FPS)
 libtcod.sys_force_fullscreen_resolution(UI_FSRES_X, UI_FSRES_Y)
