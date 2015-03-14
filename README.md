@@ -25,7 +25,7 @@ the depths of the old mine, and determine once and for all the truth about the r
 
 ## Gameplay Features
 
-Short gameplay video at http://youtu.be/RVdcWHxDBtA
+
 
 - Side view, gravity-driven mine exploration
 - Turn-based combat mechanics, but torch burns down in real time
