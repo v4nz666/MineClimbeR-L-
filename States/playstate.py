@@ -108,9 +108,7 @@ class PlayState(GameState):
     if not self.ticks % self.torchTicks:
       self.player.torchStrength = max(2, self.player.torchStrength - 1)
       self.player.needFovUpdate = True
-      print "torch tick"
     if not self.ticks % self.healthTicks:
-      print "health tick"
       self.player.torchStrength = max(0, self.player.health - 1)
 
     if self.player.falling:

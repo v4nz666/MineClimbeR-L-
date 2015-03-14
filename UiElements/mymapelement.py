@@ -43,7 +43,6 @@ class MyMapElement(Elements.Map):
               if e.spawns:
                 enemyDef = e.spawns
                 enemy = Enemy(self.player, *enemyDef['args'])
-                print "Spawning enemy: " + str(enemy.name) + " at " + str((x, mapY))
 
                 enemy.setAi(enemyDef['ai'](self._map, enemy))
                 enemy.setMap(self._map)
