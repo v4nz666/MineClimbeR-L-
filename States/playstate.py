@@ -284,7 +284,6 @@ class PlayState(GameState):
         'fn': self.helpElement.cycleTabs
       },
     })
-
     self.quitConfirm.setInputs({
       'quitBack': {
         'key': libtcod.KEY_ESCAPE,
@@ -359,6 +358,7 @@ class PlayState(GameState):
       },
 
     })
+    self.view.inputsEnabled = True
 
   def placePlayer(self):
     playerX = 1
