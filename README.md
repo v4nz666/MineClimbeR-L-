@@ -39,6 +39,10 @@ To run the game, on Linux, at least for now (pre-packaged binaries to come - hop
 
     git clone --recursive git@github.com:v4nz666/MineClimbeR-L-.git
 
+pygameis required for the audio
+
+    pip install pygame
+
 and run the game with:
 
     python main.py
