@@ -1,0 +1,7 @@
+Written using the following awesome tools/resources:
+
+RoguePy - github.com/v4nz666/RoguePy
+libtcod - http://roguecentral.org/doryen/forum/index.php?board=12.0
+All sound effects generated using - http://www.superflashbros.net/as3sfxr/
+Background Music - https://www.freesound.org/people/suonho/sounds/3158/
+
