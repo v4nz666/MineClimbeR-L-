@@ -22,6 +22,7 @@ the depths of the old mine, and determine once and for all the truth about the r
 --
 
 ### Started 2:00PM AST Saturday Mar 7th, 2015
+### Comleted 3:00PM ADT Satruday Mar 14th, 2015
 
 ## Gameplay Features
 
