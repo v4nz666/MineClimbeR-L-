@@ -13,8 +13,8 @@ class PlayState(GameState):
 
   def __init__(self, name, manager, ui):
     super(PlayState, self).__init__(name, manager, ui)
-    self.torchTicks = 150
-    self.healthTicks = 500
+    self.torchTicks = 1000
+    self.healthTicks = 1000
 
     self.msgTtl = 150.0
     self.dialogTicks = 0
@@ -125,10 +125,11 @@ class PlayState(GameState):
     # Non-turn-based updates
     self.ticks += 1
     if not self.ticks % self.torchTicks:
-      self.player.torchStrength = max(2, self.player.torchStrength - 1)
+      newTorch = self.player.torchStrength - 1
+      self.player.torchStrength = max(2, newTorch)
       self.player.needFovUpdate = True
     if not self.ticks % self.healthTicks:
-      self.player.torchStrength = max(0, self.player.health - 1)
+      self.player.health = max(0, self.player.health - 1)
 
     if self.player.falling:
       if self.cave.getCell(self.player.x, self.player.y + 1).passable():

@@ -15,8 +15,8 @@ class Actor(Item):
     self.defend = defend
     self.dex = dex
 
-    self.meleeMultiplier = 1
-    self.rangeMultiplier = 1
+    self.meleeMultiplier = 1.0
+    self.rangeMultiplier = 1.0
 
     self.map = None
     self.x = None

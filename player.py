@@ -10,7 +10,7 @@ class Player(Actor):
     self.startingAnchors = 50
     self.ropeCount = 8
 
-    self.maxTorchStrength = 15
+    self.maxTorchStrength = 20
     self.torchStrength = self.maxTorchStrength
 
     self.pickStrength = 0
