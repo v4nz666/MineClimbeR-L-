@@ -66,6 +66,9 @@ class Ai(object):
     self.enemy.setCoords(newX, newY)
 
   def reposition(self):
+
+    newX = newY = -1
+
     # Try 8 times to find a suitable spot around us, stay put if we fail
     for attempt in range(8):
       while True:

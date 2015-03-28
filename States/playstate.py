@@ -167,6 +167,7 @@ class PlayState(GameState):
           # If we weren't able to move (noPath, etc), reposition
           if not e.aiUpdate():
             e.idleUpdate()
+            self.turnTaken = False
             return
           if e.attacking():
             dmg = e.aiAttack()
