@@ -10,7 +10,7 @@ class TitleState(GameState):
     self._setupInputs()
 
   def _setupView(self):
-    title = "CaveClimbeR(L)"
+    title = "MineClimbeR(L)"
     titleX = (self.view.width - len(title)) / 2
     titleY = self.view.height / 2 - 1
     _7drl = "a 7dRL"
