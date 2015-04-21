@@ -1,5 +1,4 @@
 from pygame import mixer
-mixer.init()
 
 from States import *
 from RoguePy import setFps

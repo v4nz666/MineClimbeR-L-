@@ -11,8 +11,7 @@ from RoguePy.State.GameState import GameState
 class WorldGenState(GameState):
   def __init__(self, name, manager, ui):
     super(WorldGenState, self).__init__(name, manager, ui)
-    self.cave = None
-    self.caveW = self.view.width# * 4 / 5
+    self.caveW = self.view.width
     self.caveH = self.view.height * 10
 
     self.cave = Cave(self.caveW, self.caveH)
@@ -21,10 +20,8 @@ class WorldGenState(GameState):
     self.maxOffset = self.caveH - self.minOffset
     self.offset = self.minOffset
 
-
   def tick(self):
     self.proceed()
-
 
   def initCave(self):
 
@@ -145,22 +142,23 @@ class WorldGenState(GameState):
 
   def _genEntities(self):
     entities = {
-      itemtypes.Coal: True,
-      itemtypes.Tin: True,
-      itemtypes.Copper: True,
-      itemtypes.Iron: True,
-      itemtypes.Diamond: True,
-      itemtypes.Water: False,
-      itemtypes.BatSpawner: False,
-      itemtypes.SpiderSpawner: False,
-      itemtypes.SnakeSpawner: False,
-      itemtypes.GoblinSpawner: False,
-      itemtypes.TrollSpawner: False,
-      itemtypes.DragonSpawner: False
+      itemtypes.Coal: { 'inWall': True, 'exposed': True },
+      itemtypes.Tin: { 'inWall': True, 'exposed': True },
+      itemtypes.Copper: { 'inWall': True, 'exposed': True },
+      itemtypes.Iron: { 'inWall': True, 'exposed': True },
+      itemtypes.Diamond: { 'inWall': True, 'exposed': False },
+      itemtypes.Water: { 'inWall': False, 'exposed': False },
+      itemtypes.BatSpawner: { 'inWall': False, 'exposed': False },
+      itemtypes.SpiderSpawner: { 'inWall': False, 'exposed': False },
+      itemtypes.SnakeSpawner: { 'inWall': False, 'exposed': False },
+      itemtypes.GoblinSpawner: { 'inWall': False, 'exposed': False },
+      itemtypes.TrollSpawner: { 'inWall': False, 'exposed': False },
+      itemtypes.DragonSpawner: { 'inWall': False, 'exposed': False },
     }
 
     for entity in entities:
-      inWall = entities[entity]
+      inWall = entities[entity]['inWall']
+      exposed = entities[entity]['exposed']
       placed = 0
       while placed < entity.genCount:
         genMin = int(self.caveH * entity.genMin)
@@ -181,6 +179,21 @@ class WorldGenState(GameState):
         # Out in the open, and no floor below (forces non inWall items to be on the ground, no effect on inWall items)
         if cell.passable() and self.cave.getCell(x, y+1).passable():
           continue
+        # If the entity should be exposed, check its neighbours for a passable cell
+        if exposed:
+          place = False
+          for _x in range(-1, 2):
+            for _y in range(-1, 2):
+              if not x and not y:
+                continue
+              if self.cave.getCell(x + _x, y+_y).passable():
+                place = True
+                break
+            if place:
+              break
+          if not place:
+            continue
+
         self.cave.addEntity(entity, x, y)
         placed += 1
 

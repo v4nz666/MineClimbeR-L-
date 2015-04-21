@@ -3,22 +3,20 @@ from Item.item import Item
 from AI import *
 #from enemies import *
 from RoguePy.libtcod import libtcod
-from pygame import mixer
-
-waterSound = mixer.Sound('./sounds/water.wav')
+from sounds import waterSound
 
 Tin = Ore('Tin')
 Tin.setColor(libtcod.Color(211, 212, 213))
-Tin.genCount = 55
+Tin.genCount = 50
 Tin.genMin = 0.025
 Tin.genMax = 0.5
 Tin.multiplier = 0.75
 
 Copper = Ore('Copper')
 Copper.setColor(libtcod.Color(184, 115, 51))
-Copper.genCount = 50
+Copper.genCount = 60
 Copper.genMin = 0.05
-Copper.genMax = 0.5
+Copper.genMax = 0.6
 Copper.multiplier = 1.0
 
 Iron = Ore('Iron')
@@ -38,6 +36,7 @@ Diamond = Ore('Diamond')
 Diamond.setColor(libtcod.lightest_cyan)
 Diamond.setChar('+')
 Diamond.genCount = 10
+Diamond.MaxInv = 24
 Diamond.genMin = 0.75
 Diamond.genMax = 1.0
 Diamond.multiplier = 10
@@ -63,7 +62,7 @@ Rope.setChar('%')
 Rope.setColor(libtcod.crimson)
 Rope.collectible = False
 Rope.collectCount = 4
-Rope.maxInv = 24
+Rope.maxInv = 64
 
 String = Item('String')
 String.setChar('%')
@@ -201,7 +200,7 @@ TrollSpawner.spawns = TrollDef
 
 DragonSpawner = Item('')
 DragonSpawner.genCount = 1
-DragonSpawner.genMin = 0.95
+DragonSpawner.genMin = 0.96
 DragonSpawner.genMax = 1.0
 DragonSpawner.collectible = False
 DragonSpawner.spawns = DragonDef
@@ -248,7 +247,7 @@ def collectSteelArrow(player):
   return True
 SteelArrow.collect = collectSteelArrow
 def collectPoisonArrow(player):
-  player.collectArrows(PoisonArrow, 0)
+  player.rangeMultiplier *= 2
   return True
 PoisonArrow.collect = collectPoisonArrow
 def collectDiamondArrow(player):
