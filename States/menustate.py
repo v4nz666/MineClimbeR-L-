@@ -30,7 +30,7 @@ class MenuState(GameState):
         {'New Game' : self.menuSelected},
         {'Help' : self.menuSelected},
         {'About' : self.menuSelected},
-        {'Quit' : self.menuSelected}
+        {'Exit' : self.menuSelected}
       ])
     )
 

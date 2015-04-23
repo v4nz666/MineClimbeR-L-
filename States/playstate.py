@@ -269,7 +269,7 @@ class PlayState(GameState):
       'quit': {
         'key': libtcod.KEY_ESCAPE,
         'ch': None,
-        'fn': self.quitToggle
+        'fn': self.pauseToggle
       }
     })
     self.helpModal.setInputs({
@@ -301,7 +301,30 @@ class PlayState(GameState):
         'fn': self.quit
       }
     })
-
+    self.pauseModal.setInputs({
+      'pauseBack': {
+        'key': libtcod.KEY_ESCAPE,
+        'ch': None,
+        'fn': self.pauseToggle
+      },
+      'pauseSelect': {
+        'key': libtcod.KEY_ENTER,
+        'ch': None,
+        'fn': self.pauseMenu.selectFn
+      }
+    })
+    self.pauseMenu.setInputs({
+      'pauseUp': {
+        'key': libtcod.KEY_UP,
+        'ch': None,
+        'fn': self.pauseMenu.selectUp
+      },
+      'pauseDn': {
+        'key': libtcod.KEY_DOWN,
+        'ch': None,
+        'fn': self.pauseMenu.selectDown
+      },
+    })
     ########
     # Inventory/Crafting-specific inputs
     self.craftingModal.setInputs({
@@ -552,6 +575,33 @@ class PlayState(GameState):
     self.ropeIndicator = self.view.addElement(Elements.Label(ropeX, ropeY, ropeIndicator))
     self.ropeIndicator.setDefaultColors(libtcod.lightest_azure, libtcod.darker_green)
     self.ropeIndicator.hide()
+
+    ########
+    # Pause modal
+
+    pauseModalW = 12
+    pauseModalH = 4
+    pauseModalX = (self.view.width - pauseModalW) / 2
+    pauseModalY = (self.view.height - pauseModalH) / 3
+
+    self.pauseModal = self.view.addElement(Elements.Modal(pauseModalX, pauseModalY, pauseModalW, pauseModalH))
+
+    pauseFrame = self.pauseModal.addElement(Elements.Frame(0, 0, pauseModalW, pauseModalH))
+    pauseFrame.setDefaultColors(libtcod.dark_azure, libtcod.darkest_azure)
+
+    pauseFrame.addElement(Elements.Label(3, 0, "Paused"))\
+      .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+    pauseFrame.addElement(Elements.Label(1, pauseFrame.height - 1, "Esc - Back"))\
+      .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+
+    pauseMenuItems = [
+      {'  Volume  ': self.quitToggle},
+      {'   Quit   ': self.quitToggle}
+    ]
+
+    self.pauseMenu = pauseFrame.addElement(Elements.Menu(1, 1, pauseModalW - 2, 2, pauseMenuItems))
+    self.pauseMenu.setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+
     ########
     # Quit popup
     quitStr =  "Those rumours won't prove themselves..."
@@ -559,7 +609,7 @@ class PlayState(GameState):
     quitW = len(quitStr) + 2
     quitX = (self.view.width - quitW) / 2
     quitH = 3
-    quitY = (self.view.height - quitH) / 2
+    quitY = (self.view.height - quitH) / 2 + 1
 
     really = "Really Quit?"
     reallyW = len(really)
@@ -594,17 +644,30 @@ class PlayState(GameState):
     self.setBlocking(True)
     self._manager.setNextState('Death')
 
-  def quitToggle(self):
+  def quitToggle(self, menuIndex=None):
     if self.quitConfirm.visible:
-      self.quitConfirm.hide(self.view)
+      self.quitConfirm.hide(self.pauseModal)
     else:
-      self.quitConfirm.show(self.view)
+      self.quitConfirm.show(self.pauseModal)
 
   def quit(self):
     menuState = self._manager.getState('Menu')
     menuState.reset()
     self._manager.setNextState('Menu')
   ########
+
+  def pauseToggle(self):
+
+    # The new paused state
+    paused = not self.pauseModal.visible
+
+    self.setBlocking(paused)
+    if paused:
+      self.pauseModal.show(self.view)
+    else:
+      self.pauseModal.hide(self.view)
+
+
 
   def mvPlayer(self, deltaX, deltaY, playerFunc, turnTaken=True):
 

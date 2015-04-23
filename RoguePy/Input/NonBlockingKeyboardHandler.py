@@ -4,9 +4,9 @@ from RoguePy.libtcod import libtcod
 class NonBlockingKeyboardHandler(KeyboardHandler):
   
   gotInput = False
-  
+
   def handleInput(self):
-    key = libtcod.console_check_for_keypress()
+    key = libtcod.console_check_for_keypress(libtcod.KEY_PRESSED)
     if key.vk != libtcod.KEY_NONE:
       self.handleKeyInput(key)
       self.gotInput = True
