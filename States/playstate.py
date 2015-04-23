@@ -101,15 +101,6 @@ class PlayState(GameState):
     self.messages = []
 
   def initSound(self):
-    combatHitSound = mixer.Sound('./sounds/combatHit.wav')
-    combatMissSound = mixer.Sound('./sounds/combatMis.wav')
-    craftSound = mixer.Sound('./sounds/craft.wav')
-    dieSound = mixer.Sound('./sounds/die.wav')
-    digSound = mixer.Sound('./sounds/dig.wav')
-    fallSound = mixer.Sound('./sounds/fall.wav')
-    pickupSound = mixer.Sound('./sounds/pickup.wav')
-
-
     mixer.music.play(-1)
 
   def tick(self):
@@ -324,6 +315,13 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.pauseMenu.selectDown
       },
+    })
+    self.volumeModal.setInputs({
+      'volumeBack': {
+        'key': libtcod.KEY_ESCAPE,
+        'ch': None,
+        'fn': self.volumeToggle
+      }
     })
     ########
     # Inventory/Crafting-specific inputs
@@ -595,12 +593,26 @@ class PlayState(GameState):
       .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
 
     pauseMenuItems = [
-      {'  Volume  ': self.quitToggle},
+      {'  Volume  ': self.volumeToggle},
       {'   Quit   ': self.quitToggle}
     ]
 
     self.pauseMenu = pauseFrame.addElement(Elements.Menu(1, 1, pauseModalW - 2, 2, pauseMenuItems))
     self.pauseMenu.setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+
+    ########
+    # Volume popup
+    volumeW = 14
+    volumeH = 6
+    volumeX = (self.view.width - volumeW) / 2
+    volumeY = (self.view.height - volumeH) / 2
+    self.volumeModal = self.view.addElement(Elements.Modal(volumeX, volumeY, volumeW, volumeH))
+
+    volumeFrame = self.volumeModal.addElement(Elements.Frame(0, 0, volumeW, volumeH))
+    volumeFrame.addElement(Elements.Label(2, 1, "Music"))
+    self.musicSlider = volumeFrame.addElement(Elements.Slider(1, 2, 12, 0, 1.0, 1.0, 0.1))
+    volumeFrame.addElement(Elements.Label(2, 3, "Sound"))
+    self.soundSlider = volumeFrame.addElement(Elements.Slider(1, 4, 12, 0, 1.0, 1.0, 0.1))
 
     ########
     # Quit popup
@@ -623,12 +635,6 @@ class PlayState(GameState):
     escEnter = quitFrame.addElement(Elements.Label(1, 2, quitCmds))
     escEnter.setDefaultColors(libtcod.light_red)
     escEnter.bgOpacity = 0
-    ########
-    # Message list
-    msgW = self.view.width / 3
-    msgX = (self.view.width - msgW) / 2
-    msgH = 5
-    msgY = self.view.height - 8
 
   def drawOverlay(self):
     con = self.rangedOverlay.console
@@ -667,7 +673,11 @@ class PlayState(GameState):
     else:
       self.pauseModal.hide(self.view)
 
-
+  def volumeToggle(self, menuIndex=None):
+    if self.volumeModal.visible:
+      self.volumeModal.hide(self.pauseModal)
+    else:
+      self.volumeModal.show(self.pauseModal)
 
   def mvPlayer(self, deltaX, deltaY, playerFunc, turnTaken=True):
 
