@@ -122,40 +122,40 @@ PoisonArrow = Item('!Arrow!', Venom)
 #########
 # Enemies
 BatDef = {
-  'args': ['Bat', '^', libtcod.darkest_grey, 1, 3, 3, 10],
+  'args': ['Bat', '^', libtcod.darkest_grey, 2, 5, 5, 10],
   'ai': BatAi,
   'maxPath': 15
 }
 SpiderDef = {
-  'args': ['Spider', 'x', libtcod.darker_sepia, 3, 4, 3, 8],
+  'args': ['Spider', 'x', libtcod.darker_sepia, 3, 5, 5, 10],
   'ai': SpiderAi,
   'maxPath': 10,
   'drops': Silk,
   'dropChance': 0.5
 }
 SnakeDef = {
-  'args': ['Snake', 's', libtcod.dark_amber, 5, 5, 3, 5],
+  'args': ['Snake', 's', libtcod.dark_amber, 5, 7, 6, 5],
   'ai': SnakeAi,
   'maxPath': 5,
   'drops': Venom,
   'dropChance': 0.5
 }
 GoblinDef = {
-  'args': ['Goblin', 'g', libtcod.han, 10, 8, 6, 5],
+  'args': ['Goblin', 'g', libtcod.han, 10, 12, 10, 5],
   'ai': GoblinAi,
   'maxPath': 15,
   'drops': String,
   'dropChance': 0.25
 }
 TrollDef = {
-  'args': ['Troll', 'T', libtcod.yellow, 15, 12, 12, 2],
+  'args': ['Troll', 'T', libtcod.yellow, 15, 20, 12, 2],
   'ai': TrollAi,
   'maxPath': 20,
   'drops': Diamond,
   'dropChance': 0.05
 }
 DragonDef = {
-  'args': ['Dragon', 'D', libtcod.darker_chartreuse, 75, 30, 25, 10],
+  'args': ['Dragon', 'D', libtcod.darker_chartreuse, 75, 35, 25, 20],
   'ai': DragonAi,
   'maxPath': 50,
   'range': 4,

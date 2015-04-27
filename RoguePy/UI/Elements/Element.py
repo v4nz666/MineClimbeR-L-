@@ -29,6 +29,9 @@ class Element(View):
     self.bgOpacity = 1
     self.parent = None
 
+    self.fg = libtcod.white
+    self.bg = libtcod.black
+
     self.bgFlag = libtcod.BKGND_SET
 
   def setParent(self, parent):

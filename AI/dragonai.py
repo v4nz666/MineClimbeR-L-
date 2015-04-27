@@ -2,7 +2,7 @@ from random import random
 from Item.item import Item
 from AI.ai import Ai
 from RoguePy.libtcod import libtcod
-from pygame import mixer
+from sounds import fireSound
 
 class DragonAi(Ai):
 
@@ -19,9 +19,6 @@ class DragonAi(Ai):
     self.fire.setColor(libtcod.flame)
     self.fire.collectible = False
     self.firePath = []
-    self.fireSound = mixer.Sound('./sounds/fire.wav')
-
-
 
   def clearFirePath(self):
     for (x, y) in self.firePath:
@@ -69,7 +66,7 @@ class DragonAi(Ai):
               self.firePath.append((_x, _y))
               self.map.addEntity(self.fire, _x, _y)
       (x, y) = libtcod.line_step()
-    self.fireSound.play()
+    fireSound.play()
     return self.enemy.defAttack(self.player)
 
 

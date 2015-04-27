@@ -5,7 +5,7 @@ class Player(Actor):
 
 
   def __init__(self, name="You"):
-    super(Player, self).__init__(name, 100, 10, 10)
+    super(Player, self).__init__(name, 100, 10, 10, 10)
 
     self.startingAnchors = 50
     self.ropeCount = 8

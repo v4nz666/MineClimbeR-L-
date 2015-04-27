@@ -16,7 +16,7 @@ class Slider(Element):
     
     super(Slider, self).__init__(x, y, w, 1)
     self.sliderWidth = self.width - 2
-    self.valPerChar = (self._max - self._min) / (self.width - 2)
+    self.valPerChar = 1 + (self._max - self._min) / self.sliderWidth
     self.setChars(['<','-','>','|'])
   
   def onChange(self):
@@ -67,7 +67,6 @@ class Slider(Element):
     for x in range(self.sliderWidth):
       libtcod.console_put_char(self.console, x + 1, 0, self._center)
     libtcod.console_put_char(self.console, self.width - 1, 0, self._right)
-    
-    sliderPosition = min(self.sliderWidth - 1, self._val / self.valPerChar)
-    libtcod.console_put_char(self.console, sliderPosition + 1, 0, self._bar)
-    
+
+    sliderPosition = min(self.sliderWidth, self._val / self.valPerChar)
+    libtcod.console_put_char(self.console, sliderPosition, 0, self._bar)

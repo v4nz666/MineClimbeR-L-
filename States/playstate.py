@@ -57,21 +57,21 @@ class PlayState(GameState):
     self.messageOnDeck = None
 
     self.dialogMessages = {
-    7: '"I should be ok, if I\'m careful..."',
-    25: '"I hope this torch lasts..."',
-    50: '"I wish I had my bow..."',
-    100: '"I should have brought some water..."',
-    175: '"Monsters? What monsters?..."',
-    200: '"It\'s just bats and spiders in here..."',
-    290: '"It\'s getting really dark..."',
-    295: '"What are those letters carved into the wall?..."',
-    300: '"Doesn\'t look like any writing I\'ve seen..."',
-    400: '"Where did these creatures come from?..."',
-    500: '"Maybe MineCorp did set off the explosions..."',
-    575: '"It\'s getting really warm in here..."',
-    580: '"What was that rumbling sound?..."',
-    590: '"No one will believe me!"'
-  }
+      7: '"I should be ok, if I\'m careful..."',
+      25: '"I hope this torch lasts..."',
+      50: '"I wish I had my bow..."',
+      100: '"I should have brought some water..."',
+      175: '"Monsters? What monsters?..."',
+      200: '"It\'s just bats and spiders in here..."',
+      290: '"It\'s getting really dark..."',
+      295: '"What are those letters carved into the wall?..."',
+      300: '"Doesn\'t look like any writing I\'ve seen..."',
+      400: '"Where did these creatures come from?..."',
+      500: '"Maybe MineCorp did set off the explosions!"',
+      575: '"It\'s getting really warm in here..."',
+      580: '"What was that rumbling sound?..."',
+      590: '"No one will believe me!"'
+    }
 
   def reset(self):
     self.view.clear()
@@ -279,7 +279,7 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.helpElement.cycleTabs
       },
-    })
+      })
     self.quitConfirm.setInputs({
       'quitBack': {
         'key': libtcod.KEY_ESCAPE,
@@ -315,12 +315,56 @@ class PlayState(GameState):
         'ch': None,
         'fn': self.pauseMenu.selectDown
       },
-    })
+      })
     self.volumeModal.setInputs({
       'volumeBack': {
         'key': libtcod.KEY_ESCAPE,
         'ch': None,
         'fn': self.volumeToggle
+      },
+      'volumeSliderSelectUp': {
+        'key': libtcod.KEY_UP,
+        'ch': None,
+        'fn': self.volumeSliderToggle
+      },
+      'volumeSliderSelectDown': {
+        'key': libtcod.KEY_DOWN,
+        'ch': None,
+        'fn': self.volumeSliderToggle
+      },
+      })
+    self.musicSlider.setInputs({
+      'musicUp': {
+        'key': libtcod.KEY_RIGHT,
+        'ch': None,
+        'fn': self.musicSlider.right
+      },
+      'musicDown': {
+        'key': libtcod.KEY_LEFT,
+        'ch': None,
+        'fn': self.musicSlider.left
+      },
+      'musicMute': {
+        'key': libtcod.KEY_SPACE,
+        'ch': None,
+        'fn': self.muteMusic
+      }
+    })
+    self.soundSlider.setInputs({
+      'soundUp': {
+        'key': libtcod.KEY_RIGHT,
+        'ch': None,
+        'fn': self.soundSlider.right
+      },
+      'soundDown': {
+        'key': libtcod.KEY_LEFT,
+        'ch': None,
+        'fn': self.soundSlider.left
+      },
+      'soundMute': {
+        'key': libtcod.KEY_SPACE,
+        'ch': None,
+        'fn': self.muteSound
       }
     })
     ########
@@ -383,7 +427,7 @@ class PlayState(GameState):
         'fn': self.craftingMenu.selectFn
       },
 
-    })
+      })
     self.view.inputsEnabled = True
 
   def placePlayer(self):
@@ -587,9 +631,9 @@ class PlayState(GameState):
     pauseFrame = self.pauseModal.addElement(Elements.Frame(0, 0, pauseModalW, pauseModalH))
     pauseFrame.setDefaultColors(libtcod.dark_azure, libtcod.darkest_azure)
 
-    pauseFrame.addElement(Elements.Label(3, 0, "Paused"))\
+    pauseFrame.addElement(Elements.Label(3, 0, "Paused")) \
       .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
-    pauseFrame.addElement(Elements.Label(1, pauseFrame.height - 1, "Esc - Back"))\
+    pauseFrame.addElement(Elements.Label(1, pauseFrame.height - 1, "Esc - Back")) \
       .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
 
     pauseMenuItems = [
@@ -602,17 +646,34 @@ class PlayState(GameState):
 
     ########
     # Volume popup
+
     volumeW = 14
-    volumeH = 6
+    volumeH = 7
     volumeX = (self.view.width - volumeW) / 2
-    volumeY = (self.view.height - volumeH) / 2
+    volumeY = pauseModalY - 1
     self.volumeModal = self.view.addElement(Elements.Modal(volumeX, volumeY, volumeW, volumeH))
 
-    volumeFrame = self.volumeModal.addElement(Elements.Frame(0, 0, volumeW, volumeH))
-    volumeFrame.addElement(Elements.Label(2, 1, "Music"))
-    self.musicSlider = volumeFrame.addElement(Elements.Slider(1, 2, 12, 0, 1.0, 1.0, 0.1))
-    volumeFrame.addElement(Elements.Label(2, 3, "Sound"))
-    self.soundSlider = volumeFrame.addElement(Elements.Slider(1, 4, 12, 0, 1.0, 1.0, 0.1))
+    volumeFrame = self.volumeModal.addElement(Elements.Frame(0, 0, volumeW, volumeH)) \
+      .setDefaultColors(libtcod.dark_azure, libtcod.darkest_azure)
+
+    volumeFrame.addElement(Elements.Label(1, volumeH - 1, "Space - mute"))\
+      .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+
+    self.musicLabel = volumeFrame.addElement(Elements.Label(1, 1, "  BG Music  ")) \
+      .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+    self.musicSlider = volumeFrame.addElement(Elements.Slider(1, 2, 12, 1, 10, 10)) \
+      .setDefaultColors(libtcod.darkest_azure, libtcod.light_azure)
+
+    self.musicSlider.onChange = self.musicSliderChange
+
+    self.soundLabel = volumeFrame.addElement(Elements.Label(1, 4, "  Sound FX  ")) \
+      .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+    self.soundSlider = volumeFrame.addElement(Elements.Slider(1, 5, 12, 1, 10, 10)) \
+      .setDefaultColors(libtcod.light_azure, libtcod.darkest_azure)
+    self.soundLabel.disable()
+    self.soundSlider.disable()
+
+    self.soundSlider.onChange = self.soundSliderChange
 
     ########
     # Quit popup
@@ -679,6 +740,37 @@ class PlayState(GameState):
     else:
       self.volumeModal.show(self.pauseModal)
 
+  def volumeSliderToggle(self):
+    self.musicLabel.toggleEnabled()
+    self.musicSlider.toggleEnabled()
+    self.musicSlider.setDefaultColors(self.musicSlider.getDefaultColors()[1], self.musicSlider.getDefaultColors()[0])
+    self.soundLabel.toggleEnabled()
+    self.soundSlider.toggleEnabled()
+    self.soundSlider.setDefaultColors(self.soundSlider.getDefaultColors()[1], self.soundSlider.getDefaultColors()[0])
+
+
+  def musicSliderChange(self):
+    self.musicSlider.setDefaultColors(libtcod.darkest_azure, libtcod.light_azure)
+    setMusicVolume(self.musicSlider.getVal() / 10.0)
+  def soundSliderChange(self):
+    self.soundSlider.setDefaultColors(libtcod.darkest_azure, libtcod.light_azure)
+    setSoundVolume(self.soundSlider.getVal() / 10.0)
+
+  def muteMusic(self):
+    if getMusicVolume() == 0:
+      self.musicSliderChange()
+    else:
+      setMusicVolume(0)
+      self.musicLabel.setDefaultColors(libtcod.dark_grey, self.musicLabel.getDefaultColors()[1])
+      self.musicSlider.setDefaultColors(libtcod.dark_grey, self.musicSlider.getDefaultColors()[1])
+  def muteSound(self):
+    if getSoundVolume() == 0:
+      self.soundSliderChange()
+    else:
+      setSoundVolume(0)
+      self.soundLabel.setDefaultColors(libtcod.grey, self.soundLabel.getDefaultColors()[1])
+      self.soundSlider.setDefaultColors(libtcod.grey, self.soundSlider.getDefaultColors()[1])
+
   def mvPlayer(self, deltaX, deltaY, playerFunc, turnTaken=True):
 
     self.turnTaken = turnTaken
@@ -730,7 +822,7 @@ class PlayState(GameState):
             if not Anchor in newCell.entities:
               # No existing anchor, have some in inventory
               if Anchor in self.player.inventory:
-                self.cave.addEntity(Anchor, newX, newY)
+                self.cave.addEntity(Anchor, newX, newY, True)
                 self.player.dropItem(Anchor)
               # No existing anchor, none in inventory, we're not going anywhere
               else:
@@ -838,7 +930,9 @@ class PlayState(GameState):
       if self.player.y > 5 and self.player.anchorIn():
         self.ropeIndicator.show()
         self.ropePath.append((self.player.x, self.player.y))
-        self.cave.addEntity(Anchor, self.player.x, self.player.y)
+        if not Anchor in self.cave.getCell(self.player.x, self.player.y).entities:
+          # Anchors are inserted at the beginning of the item stack
+          self.cave.addEntity(Anchor, self.player.x, self.player.y, True)
         self.cave.addEntity(Rope, self.player.x, self.player.y)
         self.player.dropItem(Rope)
 

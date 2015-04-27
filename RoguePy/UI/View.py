@@ -138,11 +138,13 @@ class View(object):
       return inputs
   
   def setDefaultForeground(self, fg, cascade=False):
+    self.fg = fg
     libtcod.console_set_default_foreground(self.console,fg)
     if cascade:
       for e in self._elements:
         e.setDefaultForeground(fg, True)
   def setDefaultBackground(self, bg, cascade=False):
+    self.bg = bg
     libtcod.console_set_default_background(self.console,bg)
     if cascade:
       for e in self._elements:
