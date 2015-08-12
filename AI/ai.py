@@ -33,17 +33,16 @@ class Ai(object):
       self.waitLeft -= 1
 
     # In range, we can attack whether we have a path or not.
-    if hasPath:
-      if pathSize <= self.enemy.range:
-        # Our attack timer has elapsed
-        if self.waitLeft == 0:
-          # Reset the wait timer
-          self.attacking = True
-          self.waitLeft = self.waitTimeout
-          return True
-        # Not yet time to attack, jostle around a bit
-        else:
-          return False
+    if pathSize <= self.enemy.range:
+      # Our attack timer has elapsed
+      if self.waitLeft == 0:
+        # Reset the wait timer
+        self.attacking = True
+        self.waitLeft = self.waitTimeout
+        return True
+      # Not yet time to attack, returning False will trigger an idleUpdate()
+      else:
+        return False
 
 
     if hasPath:

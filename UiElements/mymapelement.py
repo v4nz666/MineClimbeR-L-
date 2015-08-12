@@ -19,7 +19,6 @@ class MyMapElement(Elements.Map):
 
   def setPlayer(self, player):
     self.player = player
-
   def draw(self):
     self.baseOpacity = (1.0*self.player.y) / self._map.height
     self.fogOpacity = min(1, 0.5 + (self.baseOpacity * 0.5))

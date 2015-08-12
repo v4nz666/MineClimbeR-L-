@@ -30,7 +30,8 @@ class DragonAi(Ai):
   def update(self):
     if len(self.firePath):
       self.clearFirePath()
-    Ai.move(self)
+    return Ai.move(self)
+
 
   def doAttack(self):
     self.attacking = False
@@ -69,11 +70,8 @@ class DragonAi(Ai):
     fireSound.play()
     return self.enemy.defAttack(self.player)
 
-
   def computePath(self, xFrom, yFrom, xTo, yTo, data):
     if self.map.getCell(xTo, yTo).passable():
       return 1.0
     else:
       return 0
-
-
